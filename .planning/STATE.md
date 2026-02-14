@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 ## Current Position
 
 Phase: 1 of 3 (Foundation & Access)
-Plan: 2 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: Executing
-Last activity: 2026-02-14 -- Completed 01-02 (Auth & RBAC)
+Last activity: 2026-02-14 -- Completed 01-04 (Employee Management)
 
-Progress: [███░░░░░░░] 13%
+Progress: [██████░░░░] 27%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 4
 - Average duration: 7min
-- Total execution time: 0.2 hours
+- Total execution time: 0.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-and-access | 2/5 | 14min | 7min |
+| 01-foundation-and-access | 4/5 | 28min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (7min), 01-02 (7min)
+- Last 5 plans: 01-01 (7min), 01-02 (7min), 01-03 (7min), 01-04 (7min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -49,6 +49,9 @@ Recent decisions affecting current work:
 - Auth0 SDK v4 uses middleware-based route handling at /auth/* (not v3 handleAuth pattern)
 - TenantService.withTenant() wraps all org-scoped queries with RLS context
 - Custom /api/auth/me endpoint for client-side session hydration (Auth0 profile lacks local roles)
+- Recursive CTE for manager reporting chain (full hierarchy, not just direct reports)
+- Department auto-created if name doesn't exist when creating employee
+- Role assignment integrated into PATCH /api/employees/[id] via roles array
 
 ### Pending Todos
 
@@ -65,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 01-02-PLAN.md
-Resume file: .planning/phases/01-foundation-and-access/01-02-SUMMARY.md
+Stopped at: Completed 01-04-PLAN.md
+Resume file: .planning/phases/01-foundation-and-access/01-04-SUMMARY.md
