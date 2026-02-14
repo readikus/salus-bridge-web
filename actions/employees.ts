@@ -1,5 +1,6 @@
-import { EmployeeWithDetails, EmployeeFilters } from "@/types/database";
+import { EmployeeWithDetails, EmployeeFilters, DataSubjectRecord } from "@/types/database";
 import { CreateEmployeeInput, UpdateEmployeeInput } from "@/schemas/employee";
+import { ImportResult } from "@/schemas/csv-import";
 import { UserRole } from "@/types/enums";
 
 /**
@@ -104,4 +105,40 @@ export async function fetchSendInvitation(employeeId: string): Promise<{ invitat
   }
 
   return res.json();
+}
+
+/**
+ * Import employees from a CSV file (ORG-01).
+ */
+export async function fetchImportEmployees(file: File): Promise<ImportResult> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("/api/employees/import", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to import employees");
+  }
+
+  const data = await res.json();
+  return data.result;
+}
+
+/**
+ * Fetch all data held about the current user -- SAR readiness (COMP-05).
+ */
+export async function fetchMyData(): Promise<DataSubjectRecord> {
+  const res = await fetch("/api/me/data");
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to fetch my data");
+  }
+
+  const responseData = await res.json();
+  return responseData.data;
 }

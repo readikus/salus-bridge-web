@@ -9,6 +9,7 @@ import {
   CreateEmployeeParams,
   UpdateEmployeeParams,
   EmployeeFilters,
+  DataSubjectRecord,
 } from "@/types/database";
 import { UserRole, AuditAction, AuditEntity, EmployeeStatus } from "@/types/enums";
 
@@ -283,5 +284,25 @@ export class EmployeeService {
 
     const roles = await UserRoleRepository.findByUserAndOrg(employee.userId, organisationId);
     return roles.map((r) => r.role);
+  }
+
+  /**
+   * Get all employees in a manager's reporting chain (AUTH-06).
+   * Uses recursive CTE for full hierarchy (direct reports + their reports).
+   */
+  static async getTeamForManager(
+    managerId: string,
+    organisationId: string,
+  ): Promise<EmployeeWithDetails[]> {
+    return TenantService.withTenant(organisationId, false, async (client) => {
+      return EmployeeRepository.findByManagerChain(managerId, organisationId, client);
+    });
+  }
+
+  /**
+   * Get all data held about an employee -- SAR readiness (COMP-05).
+   */
+  static async getMyData(employeeId: string): Promise<DataSubjectRecord | null> {
+    return EmployeeRepository.getDataSubjectRecord(employeeId);
   }
 }

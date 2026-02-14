@@ -121,3 +121,28 @@ export interface AuditFilters extends PaginationOptions {
   entity?: string;
   action?: string;
 }
+
+/**
+ * Data subject record for SAR readiness (COMP-05).
+ * Contains all data held about an employee.
+ */
+export interface DataSubjectRecord {
+  personalInfo: {
+    id: string;
+    email: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    jobTitle: string | null;
+    departmentName: string | null;
+    managerName: string | null;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  roles: {
+    role: string;
+    organisationName: string;
+    createdAt: Date;
+  }[];
+  activityLog: AuditLog[];
+}

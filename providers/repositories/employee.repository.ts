@@ -1,5 +1,5 @@
 import { pool } from "@/providers/database/pool";
-import { Employee, EmployeeWithDetails, CreateEmployeeParams, UpdateEmployeeParams, EmployeeFilters } from "@/types/database";
+import { Employee, EmployeeWithDetails, CreateEmployeeParams, UpdateEmployeeParams, EmployeeFilters, DataSubjectRecord, AuditLog } from "@/types/database";
 import { EmployeeStatus } from "@/types/enums";
 import { PoolClient } from "pg";
 
@@ -414,5 +414,118 @@ export class EmployeeRepository {
     );
 
     return result.rows;
+  }
+
+  /**
+   * Get the reporting chain for a manager (recursive CTE).
+   * Returns all direct and indirect reports as Employee records.
+   */
+  static async getReportingChain(managerId: string, client?: PoolClient): Promise<Employee[]> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const result = await queryFn(
+      `WITH RECURSIVE team AS (
+        SELECT id FROM employees WHERE manager_id = $1
+        UNION ALL
+        SELECT e.id FROM employees e INNER JOIN team t ON e.manager_id = t.id
+      )
+      SELECT
+        e.id,
+        e.user_id AS "userId",
+        e.organisation_id AS "organisationId",
+        e.department_id AS "departmentId",
+        e.manager_id AS "managerId",
+        e.job_title AS "jobTitle",
+        e.status,
+        e.invitation_token AS "invitationToken",
+        e.invitation_expires_at AS "invitationExpiresAt",
+        e.created_at AS "createdAt",
+        e.updated_at AS "updatedAt"
+      FROM employees e
+      INNER JOIN team t ON e.id = t.id
+      ORDER BY e.created_at ASC`,
+      [managerId],
+    );
+
+    return result.rows;
+  }
+
+  /**
+   * Get all data held about an employee for SAR readiness (COMP-05).
+   * Returns personal info, roles, and audit log entries about them.
+   */
+  static async getDataSubjectRecord(employeeId: string): Promise<DataSubjectRecord | null> {
+    // Get employee with details
+    const employee = await EmployeeRepository.findByIdWithDetails(employeeId);
+    if (!employee) return null;
+
+    // Get roles for the employee's user
+    let roles: { role: string; organisationName: string; createdAt: Date }[] = [];
+    if (employee.userId) {
+      const rolesResult = await pool.query(
+        `SELECT
+          ur.role,
+          o.name AS "organisationName",
+          ur.created_at AS "createdAt"
+        FROM user_roles ur
+        INNER JOIN organisations o ON ur.organisation_id = o.id
+        WHERE ur.user_id = $1
+        ORDER BY ur.created_at ASC`,
+        [employee.userId],
+      );
+      roles = rolesResult.rows;
+    }
+
+    // Get audit log entries about this employee (entity_id = employeeId or user_id = userId)
+    const auditConditions: string[] = [];
+    const auditParams: string[] = [];
+    let paramIdx = 1;
+
+    auditConditions.push(`(entity = 'EMPLOYEE' AND entity_id = $${paramIdx++})`);
+    auditParams.push(employeeId);
+
+    if (employee.userId) {
+      auditConditions.push(`user_id = $${paramIdx++}`);
+      auditParams.push(employee.userId);
+    }
+
+    const auditResult = await pool.query(
+      `SELECT
+        id,
+        user_id AS "userId",
+        organisation_id AS "organisationId",
+        action,
+        entity,
+        entity_id AS "entityId",
+        metadata,
+        ip_address AS "ipAddress",
+        created_at AS "createdAt"
+      FROM audit_logs
+      WHERE ${auditConditions.join(" OR ")}
+      ORDER BY created_at DESC
+      LIMIT 100`,
+      auditParams,
+    );
+
+    const managerName =
+      employee.managerFirstName && employee.managerLastName
+        ? `${employee.managerFirstName} ${employee.managerLastName}`
+        : null;
+
+    return {
+      personalInfo: {
+        id: employee.id,
+        email: employee.email,
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        jobTitle: employee.jobTitle,
+        departmentName: employee.departmentName,
+        managerName,
+        status: employee.status,
+        createdAt: employee.createdAt,
+        updatedAt: employee.updatedAt,
+      },
+      roles,
+      activityLog: auditResult.rows,
+    };
   }
 }
