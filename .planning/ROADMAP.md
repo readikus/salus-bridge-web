@@ -22,12 +22,12 @@ SalusBridge delivers a compliance-first workplace health coordination platform i
   3. Admin users can log in with email/password; employees can access the platform via single-use magic link
   4. Each role (platform admin, org admin, HR, manager, employee) sees only data appropriate to their permissions, with managers scoped to direct reports only
   5. Every access to health-related data is logged in an immutable audit trail, sensitive fields are encrypted at rest, and employees can view what data is held about them
-**Plans**: TBD
+**Plans**: 3 plans (3 waves, sequential)
 
 Plans:
-- [ ] 01-01: Database schema, multi-tenancy, and compliance infrastructure
-- [ ] 01-02: Authentication, RBAC, and tenant context
-- [ ] 01-03: Organisation and employee management with CSV import
+- [ ] 01-01-PLAN.md — Scaffold Next.js project, database schema, encryption, and audit logging (Wave 1)
+- [ ] 01-02-PLAN.md — Auth0 integration, RBAC, tenant context, and employee invitation flow (Wave 2)
+- [ ] 01-03-PLAN.md — Organisation CRUD, employee management, CSV import, and SAR data view (Wave 3)
 
 ### Phase 2: Sickness Lifecycle
 **Goal**: An employee can report sickness and be guided through a complete return-to-work cycle -- with their manager receiving structured, empathetic guidance at every step
