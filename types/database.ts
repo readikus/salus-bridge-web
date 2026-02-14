@@ -50,6 +50,46 @@ export interface Employee {
   updatedAt: Date;
 }
 
+/**
+ * Extended employee with joined user and department data.
+ * Used for list/detail views.
+ */
+export interface EmployeeWithDetails extends Employee {
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  departmentName: string | null;
+  managerFirstName: string | null;
+  managerLastName: string | null;
+  managerEmail: string | null;
+}
+
+export interface CreateEmployeeParams {
+  organisationId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  jobTitle?: string;
+  departmentId?: string;
+  managerId?: string;
+}
+
+export interface UpdateEmployeeParams {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  jobTitle?: string;
+  departmentId?: string | null;
+  managerId?: string | null;
+  status?: EmployeeStatus;
+}
+
+export interface EmployeeFilters {
+  status?: string;
+  departmentId?: string;
+  managerId?: string;
+}
+
 export interface AuditLog {
   id: string;
   userId: string | null;
