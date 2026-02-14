@@ -6,7 +6,7 @@ SalusBridge delivers a compliance-first workplace health coordination platform i
 
 ## Phases
 
-- [ ] **Phase 1: Foundation & Access** - Multi-tenant platform with auth, RBAC, compliance infrastructure, and organisation/employee management
+- [x] **Phase 1: Foundation & Access** - Multi-tenant platform with auth, RBAC, compliance infrastructure, and organisation/employee management _(completed 2026-02-14)_
 - [ ] **Phase 2: Sickness Lifecycle** - Complete sickness case flow from reporting through return-to-work, with manager guidance and notifications
 - [ ] **Phase 3: Monitoring & Intelligence** - Trigger points, analytics dashboards, and OH provider integration
 
@@ -25,11 +25,11 @@ SalusBridge delivers a compliance-first workplace health coordination platform i
 **Plans**: 5 plans (4 waves)
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold Next.js project, database schema, encryption, and audit logging (Wave 1)
-- [ ] 01-02-PLAN.md — Auth0 integration, RBAC, tenant context, notification privacy scaffolding, and employee invitation flow (Wave 2)
-- [ ] 01-03-PLAN.md — Organisation CRUD, admin assignment, dashboard, and settings (Wave 3)
-- [ ] 01-04-PLAN.md — Employee CRUD, role assignment, and employee management UI (Wave 3)
-- [ ] 01-05-PLAN.md — CSV import, SAR data view, and manager reporting chain scope (Wave 4)
+- [x] 01-01-PLAN.md — Scaffold Next.js project, database schema, encryption, and audit logging (Wave 1)
+- [x] 01-02-PLAN.md — Auth0 integration, RBAC, tenant context, notification privacy scaffolding, and employee invitation flow (Wave 2)
+- [x] 01-03-PLAN.md — Organisation CRUD, admin assignment, dashboard, and settings (Wave 3)
+- [x] 01-04-PLAN.md — Employee CRUD, role assignment, and employee management UI (Wave 3)
+- [x] 01-05-PLAN.md — CSV import, SAR data view, and manager reporting chain scope (Wave 4)
 
 ### Phase 2: Sickness Lifecycle
 **Goal**: An employee can report sickness and be guided through a complete return-to-work cycle -- with their manager receiving structured, empathetic guidance at every step
@@ -71,6 +71,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Access | 0/5 | Not started | - |
+| 1. Foundation & Access | 5/5 | ✓ Complete | 2026-02-14 |
 | 2. Sickness Lifecycle | 0/3 | Not started | - |
 | 3. Monitoring & Intelligence | 0/3 | Not started | - |
