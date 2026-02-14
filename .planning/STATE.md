@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 Phase: 1 of 3 (Foundation & Access)
 Plan: 4 of 5 in current phase
 Status: Executing
-Last activity: 2026-02-14 -- Completed 01-04 (Employee Management)
+Last activity: 2026-02-14 -- Completed 01-03 (Organisation Management)
 
 Progress: [██████░░░░] 27%
 
@@ -30,7 +30,7 @@ Progress: [██████░░░░] 27%
 | 01-foundation-and-access | 4/5 | 28min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (7min), 01-02 (7min), 01-03 (7min), 01-04 (7min)
+- Last 5 plans: 01-01 (7min), 01-02 (7min), 01-04 (7min), 01-03 (8min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -49,6 +49,9 @@ Recent decisions affecting current work:
 - Auth0 SDK v4 uses middleware-based route handling at /auth/* (not v3 handleAuth pattern)
 - TenantService.withTenant() wraps all org-scoped queries with RLS context
 - Custom /api/auth/me endpoint for client-side session hydration (Auth0 profile lacks local roles)
+- Organisation list uses server-side data fetching with client TanStack Table for sorting/pagination
+- Platform admin dashboard redirects to /organisations rather than rendering inline
+- Employee dashboard shows 4 cards (Profile, Absences, Documents, Wellbeing) to feel like a real product
 - Recursive CTE for manager reporting chain (full hierarchy, not just direct reports)
 - Department auto-created if name doesn't exist when creating employee
 - Role assignment integrated into PATCH /api/employees/[id] via roles array
@@ -68,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 01-04-PLAN.md
-Resume file: .planning/phases/01-foundation-and-access/01-04-SUMMARY.md
+Stopped at: Completed 01-03-PLAN.md
+Resume file: .planning/phases/01-foundation-and-access/01-03-SUMMARY.md
