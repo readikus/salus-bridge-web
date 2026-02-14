@@ -143,13 +143,70 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| *(populated during roadmap creation)* | | |
+| PLAT-01 | Phase 1 | Pending |
+| PLAT-02 | Phase 1 | Pending |
+| PLAT-03 | Phase 1 | Pending |
+| ORG-01 | Phase 1 | Pending |
+| ORG-02 | Phase 1 | Pending |
+| ORG-03 | Phase 1 | Pending |
+| ORG-04 | Phase 1 | Pending |
+| ORG-05 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| AUTH-07 | Phase 1 | Pending |
+| COMP-01 | Phase 1 | Pending |
+| COMP-02 | Phase 1 | Pending |
+| COMP-03 | Phase 1 | Pending |
+| COMP-04 | Phase 1 | Pending |
+| COMP-05 | Phase 1 | Pending |
+| SICK-01 | Phase 2 | Pending |
+| SICK-02 | Phase 2 | Pending |
+| SICK-03 | Phase 2 | Pending |
+| SICK-04 | Phase 2 | Pending |
+| SICK-05 | Phase 2 | Pending |
+| SICK-06 | Phase 2 | Pending |
+| WRKF-01 | Phase 2 | Pending |
+| WRKF-02 | Phase 2 | Pending |
+| WRKF-03 | Phase 2 | Pending |
+| WRKF-04 | Phase 2 | Pending |
+| FIT-01 | Phase 2 | Pending |
+| FIT-02 | Phase 2 | Pending |
+| FIT-03 | Phase 2 | Pending |
+| FIT-04 | Phase 2 | Pending |
+| RTW-01 | Phase 2 | Pending |
+| RTW-02 | Phase 2 | Pending |
+| RTW-03 | Phase 2 | Pending |
+| RTW-04 | Phase 2 | Pending |
+| GUID-01 | Phase 2 | Pending |
+| GUID-02 | Phase 2 | Pending |
+| GUID-03 | Phase 2 | Pending |
+| GUID-04 | Phase 2 | Pending |
+| NOTF-01 | Phase 2 | Pending |
+| NOTF-02 | Phase 2 | Pending |
+| NOTF-03 | Phase 2 | Pending |
+| NOTF-04 | Phase 2 | Pending |
+| TRIG-01 | Phase 3 | Pending |
+| TRIG-02 | Phase 3 | Pending |
+| TRIG-03 | Phase 3 | Pending |
+| ANAL-01 | Phase 3 | Pending |
+| ANAL-02 | Phase 3 | Pending |
+| ANAL-03 | Phase 3 | Pending |
+| ANAL-04 | Phase 3 | Pending |
+| ANAL-05 | Phase 3 | Pending |
+| PROV-01 | Phase 3 | Pending |
+| PROV-02 | Phase 3 | Pending |
+| PROV-03 | Phase 3 | Pending |
+| PROV-04 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements: 47 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 47
+- v1 requirements: 58 total
+- Mapped to phases: 58
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-14*
-*Last updated: 2026-02-14 after initial definition*
+*Last updated: 2026-02-14 after roadmap creation*
