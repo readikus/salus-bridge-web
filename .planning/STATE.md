@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 ## Current Position
 
 Phase: 1 of 3 (Foundation & Access)
-Plan: 4 of 5 in current phase
-Status: Executing
-Last activity: 2026-02-14 -- Completed 01-03 (Organisation Management)
+Plan: 5 of 5 in current phase
+Status: Phase Complete
+Last activity: 2026-02-14 -- Completed 01-05 (CSV Import & SAR Data)
 
-Progress: [██████░░░░] 27%
+Progress: [███████░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 7min
-- Total execution time: 0.5 hours
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-and-access | 4/5 | 28min | 7min |
+| 01-foundation-and-access | 5/5 | 33min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (7min), 01-02 (7min), 01-04 (7min), 01-03 (8min)
+- Last 5 plans: 01-01 (7min), 01-02 (7min), 01-04 (7min), 01-03 (8min), 01-05 (5min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -55,6 +55,10 @@ Recent decisions affecting current work:
 - Recursive CTE for manager reporting chain (full hierarchy, not just direct reports)
 - Department auto-created if name doesn't exist when creating employee
 - Role assignment integrated into PATCH /api/employees/[id] via roles array
+- papaparse for CSV parsing (handles quoted fields, edge cases)
+- Two-pass import: create employees first, then link managers (handles forward references)
+- SAR data includes audit entries both about and by the employee
+- CSV import wizard uses single-page step flow
 
 ### Pending Todos
 
@@ -63,7 +67,7 @@ None yet.
 ### Blockers/Concerns
 
 - DPIA (Data Protection Impact Assessment) should be completed before Phase 2 health data work begins
-- Library versions from research need verification against npm before install (papaparse, date-fns, recharts, etc.)
+- Library versions from research need verification against npm before install (date-fns, recharts, etc.)
 - DATABASE_URL: Supabase project in .env (rbejmrydmkdybbvscwth) does not exist. User must provide valid DATABASE_URL and run migrations
 - AUTH0: Auth0 application credentials (AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_SECRET) must be configured in .env.local
 - AUTH0 Management API: AUTH0_MANAGEMENT_CLIENT_ID and AUTH0_MANAGEMENT_CLIENT_SECRET needed for invitation password setup
@@ -71,5 +75,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 01-03-PLAN.md
-Resume file: .planning/phases/01-foundation-and-access/01-03-SUMMARY.md
+Stopped at: Completed 01-05-PLAN.md (Phase 1 complete)
+Resume file: .planning/phases/01-foundation-and-access/01-05-SUMMARY.md
