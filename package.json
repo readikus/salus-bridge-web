@@ -1,0 +1,38 @@
+{
+  "name": "salus-bridge-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "tsc": "tsc --noEmit",
+    "migrate:up": "knex migrate:up --knexfile knexfile.ts",
+    "migrate:down": "knex migrate:down --knexfile knexfile.ts",
+    "migrate:status": "knex migrate:status --knexfile knexfile.ts"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "dotenv": "^16.4.7",
+    "knex": "^3.1.0",
+    "lucide-react": "^0.475.0",
+    "next": "16.1.6",
+    "pg": "^8.13.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.0.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.11.11",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
