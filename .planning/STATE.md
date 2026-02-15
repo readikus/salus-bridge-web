@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 ## Current Position
 
 Phase: 2 of 3 (Sickness Lifecycle)
-Plan: 2 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In Progress
-Last activity: 2026-02-15 -- Completed 02-02 (Sickness Reporting & Workflow)
+Last activity: 2026-02-15 -- Completed 02-03 (Fit Note Management)
 
-Progress: [████████░░] 47%
+Progress: [█████████░] 53%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 6min
-- Total execution time: 0.7 hours
+- Total execution time: 0.8 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
-| 02-sickness-lifecycle | 2/5 | 9min | 5min |
+| 02-sickness-lifecycle | 3/5 | 14min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-04 (7min), 01-03 (8min), 01-05 (5min), 02-01 (3min), 02-02 (6min)
+- Last 5 plans: 01-03 (8min), 01-05 (5min), 02-01 (3min), 02-02 (6min), 02-03 (5min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -67,6 +67,10 @@ Recent decisions affecting current work:
 - WorkflowService as single entry point for all state transitions (wraps TenantService.withTenant)
 - Long-term threshold checked on every transition using org settings absenceTriggerThresholds.longTermDays
 - ACKNOWLEDGE action allowed for EMPLOYEE role; other transitions require MANAGE_SICKNESS_CASES
+- Supabase Storage private bucket with 5-minute signed URLs for secure fit note document access
+- FIT-04 manager exclusion enforced at service layer via assertNotManager() (not just permission layer)
+- Cron endpoint (/api/cron/fit-note-expiry) uses CRON_SECRET bearer token, not user auth
+- Storage cleanup on failure: uploaded file deleted from Supabase if DB record creation fails
 
 ### Pending Todos
 
@@ -83,5 +87,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 02-02-PLAN.md
-Resume file: .planning/phases/02-sickness-lifecycle/02-02-SUMMARY.md
+Stopped at: Completed 02-03-PLAN.md
+Resume file: .planning/phases/02-sickness-lifecycle/02-03-SUMMARY.md
