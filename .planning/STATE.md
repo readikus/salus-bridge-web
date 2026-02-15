@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 ## Current Position
 
 Phase: 2 of 3 (Sickness Lifecycle)
-Plan: 1 of 5 in current phase
+Plan: 2 of 5 in current phase
 Status: In Progress
-Last activity: 2026-02-15 -- Completed 02-01 (Schema & Types)
+Last activity: 2026-02-15 -- Completed 02-02 (Sickness Reporting & Workflow)
 
-Progress: [████████░░] 40%
+Progress: [████████░░] 47%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 6min
-- Total execution time: 0.6 hours
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
-| 02-sickness-lifecycle | 1/5 | 3min | 3min |
+| 02-sickness-lifecycle | 2/5 | 9min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (7min), 01-04 (7min), 01-03 (8min), 01-05 (5min), 02-01 (3min)
+- Last 5 plans: 01-04 (7min), 01-03 (8min), 01-05 (5min), 02-01 (3min), 02-02 (6min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -63,6 +63,10 @@ Recent decisions affecting current work:
 - case_transitions uses join-based RLS policy (no direct organisation_id) to avoid denormalization
 - Hand-rolled state machine via VALID_TRANSITIONS Record rather than xstate library
 - 9 new RBAC permissions: EMPLOYEE gets own-only sickness access, HR/ORG_ADMIN get full sickness access
+- GOV.UK bank holidays API with 24h cache and static 2026 fallback for working day calculation
+- WorkflowService as single entry point for all state transitions (wraps TenantService.withTenant)
+- Long-term threshold checked on every transition using org settings absenceTriggerThresholds.longTermDays
+- ACKNOWLEDGE action allowed for EMPLOYEE role; other transitions require MANAGE_SICKNESS_CASES
 
 ### Pending Todos
 
@@ -71,7 +75,7 @@ None yet.
 ### Blockers/Concerns
 
 - DPIA (Data Protection Impact Assessment) should be completed before Phase 2 health data work begins
-- Library versions from research need verification against npm before install (date-fns, recharts, etc.)
+- Library versions from research need verification against npm before install (recharts, etc.) -- date-fns@4.1.0 installed
 - DATABASE_URL: Supabase project in .env (rbejmrydmkdybbvscwth) does not exist. User must provide valid DATABASE_URL and run migrations
 - AUTH0: Auth0 application credentials (AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_SECRET) must be configured in .env.local
 - AUTH0 Management API: AUTH0_MANAGEMENT_CLIENT_ID and AUTH0_MANAGEMENT_CLIENT_SECRET needed for invitation password setup
@@ -79,5 +83,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 02-01-PLAN.md
-Resume file: .planning/phases/02-sickness-lifecycle/02-01-SUMMARY.md
+Stopped at: Completed 02-02-PLAN.md
+Resume file: .planning/phases/02-sickness-lifecycle/02-02-SUMMARY.md
