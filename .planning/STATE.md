@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-14)
 
 **Core value:** An employee can report sickness and be guided through a complete return-to-work cycle -- with their manager receiving structured, empathetic guidance at every step.
-**Current focus:** Phase 1 - Foundation & Access
+**Current focus:** Phase 2 - Sickness Lifecycle
 
 ## Current Position
 
-Phase: 1 of 3 (Foundation & Access)
-Plan: 5 of 5 in current phase
-Status: Phase Complete
-Last activity: 2026-02-14 -- Completed 01-05 (CSV Import & SAR Data)
+Phase: 2 of 3 (Sickness Lifecycle)
+Plan: 1 of 5 in current phase
+Status: In Progress
+Last activity: 2026-02-15 -- Completed 02-01 (Schema & Types)
 
-Progress: [███████░░░] 33%
+Progress: [████████░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 7min
+- Total plans completed: 6
+- Average duration: 6min
 - Total execution time: 0.6 hours
 
 **By Phase:**
@@ -28,9 +28,10 @@ Progress: [███████░░░] 33%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
+| 02-sickness-lifecycle | 1/5 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (7min), 01-02 (7min), 01-04 (7min), 01-03 (8min), 01-05 (5min)
+- Last 5 plans: 01-02 (7min), 01-04 (7min), 01-03 (8min), 01-05 (5min), 02-01 (3min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -59,6 +60,9 @@ Recent decisions affecting current work:
 - Two-pass import: create employees first, then link managers (handles forward references)
 - SAR data includes audit entries both about and by the employee
 - CSV import wizard uses single-page step flow
+- case_transitions uses join-based RLS policy (no direct organisation_id) to avoid denormalization
+- Hand-rolled state machine via VALID_TRANSITIONS Record rather than xstate library
+- 9 new RBAC permissions: EMPLOYEE gets own-only sickness access, HR/ORG_ADMIN get full sickness access
 
 ### Pending Todos
 
@@ -74,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14
-Stopped at: Completed 01-05-PLAN.md (Phase 1 complete)
-Resume file: .planning/phases/01-foundation-and-access/01-05-SUMMARY.md
+Last session: 2026-02-15
+Stopped at: Completed 02-01-PLAN.md
+Resume file: .planning/phases/02-sickness-lifecycle/02-01-SUMMARY.md
