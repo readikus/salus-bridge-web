@@ -8,22 +8,24 @@
     "start": "next start",
     "lint": "eslint",
     "tsc": "tsc --noEmit",
-    "migrate:up": "knex migrate:up --knexfile knexfile.ts",
-    "migrate:down": "knex migrate:down --knexfile knexfile.ts",
-    "migrate:status": "knex migrate:status --knexfile knexfile.ts"
+    "migrate:up": "dotenv -e .env.local -- knex migrate:up --knexfile knexfile.ts",
+    "migrate:down": "dotenv -e .env.local -- knex migrate:down --knexfile knexfile.ts",
+    "migrate:status": "dotenv -e .env.local -- knex migrate:status --knexfile knexfile.ts"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^4.15.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.95.3",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "knex": "^3.1.0",
     "lucide-react": "^0.475.0",
@@ -44,9 +46,11 @@
     "@types/pg": "^8.11.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
