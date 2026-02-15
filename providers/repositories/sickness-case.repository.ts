@@ -7,6 +7,8 @@ export interface SicknessCaseFilters {
   status?: string;
   employeeId?: string;
   search?: string;
+  startDateFrom?: string;
+  startDateTo?: string;
 }
 
 /**
@@ -73,6 +75,19 @@ export class SicknessCaseRepository {
       );
       values.push(`%${filters.search}%`);
       paramIndex++;
+    }
+    // Date range filter: absences that overlap with the specified range
+    // Overlap condition: absence_start_date <= endOfRange AND (absence_end_date >= startOfRange OR absence_end_date IS NULL)
+    if (filters?.startDateFrom) {
+      conditions.push(
+        `(sc.absence_end_date >= $${paramIndex} OR sc.absence_end_date IS NULL)`,
+      );
+      values.push(filters.startDateFrom);
+      paramIndex++;
+    }
+    if (filters?.startDateTo) {
+      conditions.push(`sc.absence_start_date <= $${paramIndex++}`);
+      values.push(filters.startDateTo);
     }
 
     const result = await queryFn(

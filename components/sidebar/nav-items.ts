@@ -10,6 +10,7 @@ import {
   UsersRound,
   ClipboardPlus,
   CalendarDays,
+  Calendar,
   LucideIcon,
 } from "lucide-react";
 
@@ -66,6 +67,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/sickness/report",
     icon: ClipboardPlus,
     roles: [UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE],
+  },
+  {
+    label: "Absence Calendar",
+    href: "/calendar",
+    icon: Calendar,
+    roles: [UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER],
   },
   {
     label: "Absence History",

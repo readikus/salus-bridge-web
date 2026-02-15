@@ -94,6 +94,31 @@ export async function fetchTransitionCase(
 }
 
 /**
+ * Fetch sickness cases for the absence calendar with date range filtering.
+ */
+export async function fetchAbsenceCalendar(
+  month: number,
+  year: number,
+): Promise<{ cases: SicknessCase[]; total: number }> {
+  const startOfMonth = `${year}-${String(month).padStart(2, "0")}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const endOfMonth = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+  const params = new URLSearchParams();
+  params.set("startDateFrom", startOfMonth);
+  params.set("startDateTo", endOfMonth);
+
+  const url = `/api/sickness-cases?${params.toString()}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to fetch absence calendar data");
+  }
+
+  return res.json();
+}
+
+/**
  * Update a sickness case (e.g., set end date).
  */
 export async function fetchUpdateSicknessCase(

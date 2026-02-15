@@ -34,6 +34,8 @@ export async function GET(request: NextRequest) {
       status: searchParams.get("status") || undefined,
       employeeId: searchParams.get("employeeId") || undefined,
       search: searchParams.get("search") || undefined,
+      startDateFrom: searchParams.get("startDateFrom") || undefined,
+      startDateTo: searchParams.get("startDateTo") || undefined,
     };
 
     // Determine role-based access scope
