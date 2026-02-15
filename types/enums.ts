@@ -14,6 +14,11 @@ export enum AuditAction {
   EXPORT = "EXPORT",
   LOGIN = "LOGIN",
   INVITE = "INVITE",
+  TRANSITION = "TRANSITION",
+  UPLOAD = "UPLOAD",
+  DOWNLOAD = "DOWNLOAD",
+  SCHEDULE = "SCHEDULE",
+  SEND = "SEND",
 }
 
 export enum AuditEntity {
@@ -22,6 +27,11 @@ export enum AuditEntity {
   EMPLOYEE = "EMPLOYEE",
   ROLE = "ROLE",
   AUDIT_LOG = "AUDIT_LOG",
+  SICKNESS_CASE = "SICKNESS_CASE",
+  FIT_NOTE = "FIT_NOTE",
+  RTW_MEETING = "RTW_MEETING",
+  GUIDANCE = "GUIDANCE",
+  NOTIFICATION = "NOTIFICATION",
 }
 
 export enum OrganisationStatus {

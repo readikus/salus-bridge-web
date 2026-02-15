@@ -1,4 +1,6 @@
 import { UserRole as UserRoleEnum, AuditAction, AuditEntity, OrganisationStatus, EmployeeStatus } from "./enums";
+import { SicknessState } from "@/constants/sickness-states";
+import { AbsenceType } from "@/constants/absence-types";
 
 export interface Organisation {
   id: string;
@@ -13,7 +15,7 @@ export interface Organisation {
 export interface User {
   id: string;
   email: string;
-  auth0Id: string | null;
+  supabaseAuthId: string | null;
   firstName: string | null;
   lastName: string | null;
   isActive: boolean;
@@ -110,6 +112,77 @@ export interface CreateAuditLogParams {
   entityId?: string;
   metadata?: Record<string, unknown>;
   ipAddress?: string;
+}
+
+export interface SicknessCase {
+  id: string;
+  organisationId: string;
+  employeeId: string;
+  reportedBy: string;
+  status: SicknessState;
+  absenceType: AbsenceType;
+  absenceStartDate: string;
+  absenceEndDate: string | null;
+  workingDaysLost: number | null;
+  notesEncrypted: string | null;
+  isLongTerm: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CaseTransition {
+  id: string;
+  sicknessCaseId: string;
+  fromStatus: string | null;
+  toStatus: string;
+  action: string;
+  performedBy: string;
+  notes: string | null;
+  createdAt: Date;
+}
+
+export interface FitNote {
+  id: string;
+  organisationId: string;
+  sicknessCaseId: string;
+  employeeId: string;
+  uploadedBy: string;
+  storagePath: string;
+  fileName: string;
+  fileSizeBytes: number | null;
+  contentType: string | null;
+  fitNoteStatus: string;
+  startDate: string;
+  endDate: string | null;
+  functionalEffects: string[];
+  notesEncrypted: string | null;
+  createdAt: Date;
+}
+
+export interface RtwMeeting {
+  id: string;
+  organisationId: string;
+  sicknessCaseId: string;
+  employeeId: string;
+  scheduledBy: string;
+  scheduledDate: Date;
+  completedDate: Date | null;
+  status: string;
+  questionnaireResponses: Record<string, unknown> | null;
+  outcomesEncrypted: string | null;
+  adjustments: Array<{ type: string; description: string; reviewDate?: string }>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface GuidanceEngagement {
+  id: string;
+  organisationId: string;
+  sicknessCaseId: string;
+  userId: string;
+  guidanceType: string;
+  guidanceStep: string;
+  engagedAt: Date;
 }
 
 export interface PaginationOptions {
