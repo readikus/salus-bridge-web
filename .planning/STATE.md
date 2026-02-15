@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 ## Current Position
 
 Phase: 2 of 3 (Sickness Lifecycle)
-Plan: 4 of 5 in current phase
-Status: In Progress
-Last activity: 2026-02-15 -- Completed 02-04 (RTW Meeting & Guidance)
+Plan: 5 of 5 in current phase
+Status: Phase 2 Complete
+Last activity: 2026-02-15 -- Completed 02-05 (Notifications, Calendar & Dashboard)
 
-Progress: [██████████░] 60%
+Progress: [█████████████░] 66%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 9min
-- Total execution time: 1.2 hours
+- Total plans completed: 10
+- Average duration: 10min
+- Total execution time: 1.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
-| 02-sickness-lifecycle | 4/5 | 54min | 14min |
+| 02-sickness-lifecycle | 5/5 | 76min | 15min |
 
 **Recent Trend:**
-- Last 5 plans: 01-05 (5min), 02-01 (3min), 02-02 (6min), 02-03 (5min), 02-04 (40min)
-- Trend: 02-04 longer due to large guidance content authoring
+- Last 5 plans: 02-01 (3min), 02-02 (6min), 02-03 (5min), 02-04 (40min), 02-05 (22min)
+- Trend: Phase 2 complete, 02-05 included SendGrid setup + calendar UI
 
 *Updated after each plan completion*
 
@@ -75,6 +75,11 @@ Recent decisions affecting current work:
 - Guidance type mapped from case state: REPORTED/TRACKING -> initial_contact, FIT_NOTE_RECEIVED -> check_in, RTW_SCHEDULED+ -> rtw_meeting
 - RTW outcomes encrypted; questionnaire responses stored as JSONB (non-diagnostic, structured)
 - RTW meeting cancellation does not trigger state transition (allows rescheduling)
+- No notification repository; sends logged via AuditLogService with AuditEntity.NOTIFICATION
+- Fire-and-forget notifications: failures caught and logged, never block workflow transitions
+- Calendar shows first name + last initial for privacy (not full employee names)
+- CSS grid calendar with Tailwind (no external calendar library)
+- Date range filtering uses overlap logic for calendar month queries
 
 ### Pending Todos
 
@@ -91,5 +96,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 02-04-PLAN.md
-Resume file: .planning/phases/02-sickness-lifecycle/02-04-SUMMARY.md
+Stopped at: Completed 02-05-PLAN.md (Phase 2 complete)
+Resume file: .planning/phases/02-sickness-lifecycle/02-05-SUMMARY.md
