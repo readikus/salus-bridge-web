@@ -8,6 +8,8 @@ import {
   Settings,
   UserCircle,
   UsersRound,
+  ClipboardPlus,
+  CalendarDays,
   LucideIcon,
 } from "lucide-react";
 
@@ -60,6 +62,18 @@ export const NAV_ITEMS: NavItem[] = [
     roles: [UserRole.MANAGER],
   },
   {
+    label: "Report Sickness",
+    href: "/sickness/report",
+    icon: ClipboardPlus,
+    roles: [UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE],
+  },
+  {
+    label: "Absence History",
+    href: "/sickness/history",
+    icon: CalendarDays,
+    roles: [UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE],
+  },
+  {
     label: "My Profile",
     href: "/my-profile",
     icon: UserCircle,
@@ -80,8 +94,9 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * Filter nav items based on user's roles.
+ * Filter nav items based on user's roles. Super admins see everything.
  */
-export function getNavItemsForRoles(userRoles: UserRole[]): NavItem[] {
+export function getNavItemsForRoles(userRoles: UserRole[], isSuperAdmin = false): NavItem[] {
+  if (isSuperAdmin) return NAV_ITEMS;
   return NAV_ITEMS.filter((item) => item.roles.some((role) => userRoles.includes(role)));
 }
