@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 ## Current Position
 
 Phase: 2 of 3 (Sickness Lifecycle)
-Plan: 3 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: In Progress
-Last activity: 2026-02-15 -- Completed 02-03 (Fit Note Management)
+Last activity: 2026-02-15 -- Completed 02-04 (RTW Meeting & Guidance)
 
-Progress: [█████████░] 53%
+Progress: [██████████░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 6min
-- Total execution time: 0.8 hours
+- Total plans completed: 9
+- Average duration: 9min
+- Total execution time: 1.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
-| 02-sickness-lifecycle | 3/5 | 14min | 5min |
+| 02-sickness-lifecycle | 4/5 | 54min | 14min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (8min), 01-05 (5min), 02-01 (3min), 02-02 (6min), 02-03 (5min)
-- Trend: Consistent
+- Last 5 plans: 01-05 (5min), 02-01 (3min), 02-02 (6min), 02-03 (5min), 02-04 (40min)
+- Trend: 02-04 longer due to large guidance content authoring
 
 *Updated after each plan completion*
 
@@ -71,6 +71,10 @@ Recent decisions affecting current work:
 - FIT-04 manager exclusion enforced at service layer via assertNotManager() (not just permission layer)
 - Cron endpoint (/api/cron/fit-note-expiry) uses CRON_SECRET bearer token, not user auth
 - Storage cleanup on failure: uploaded file deleted from Supabase if DB record creation fails
+- 5 guidance scripts: initial_contact (mental_health, musculoskeletal, general), check_in (general), rtw_meeting (general) with general fallback
+- Guidance type mapped from case state: REPORTED/TRACKING -> initial_contact, FIT_NOTE_RECEIVED -> check_in, RTW_SCHEDULED+ -> rtw_meeting
+- RTW outcomes encrypted; questionnaire responses stored as JSONB (non-diagnostic, structured)
+- RTW meeting cancellation does not trigger state transition (allows rescheduling)
 
 ### Pending Todos
 
@@ -87,5 +91,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 02-03-PLAN.md
-Resume file: .planning/phases/02-sickness-lifecycle/02-03-SUMMARY.md
+Stopped at: Completed 02-04-PLAN.md
+Resume file: .planning/phases/02-sickness-lifecycle/02-04-SUMMARY.md
