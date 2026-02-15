@@ -41,12 +41,14 @@ Plans:
   3. Manager or HR can schedule a return-to-work meeting, complete a structured questionnaire, record outcomes and adjustments, and close the sickness case
   4. Manager receives contextual, empathetic conversation guidance appropriate to the absence scenario at key workflow moments (initial contact, check-in, RTW meeting)
   5. Relevant parties receive notifications at each workflow step (sickness reported, fit note expiring, RTW scheduled) without health details being exposed in notification content
-**Plans**: TBD
+**Plans**: 5 plans (4 waves)
 
 Plans:
-- [ ] 02-01: Sickness reporting and workflow state machine
-- [ ] 02-02: Fit note management and health data handling
-- [ ] 02-03: Return-to-work workflow, manager guidance, and notifications
+- [ ] 02-01-PLAN.md — Database schema, RLS policies, constants, types, permissions, and Zod schemas (Wave 1)
+- [ ] 02-02-PLAN.md — Sickness case reporting, workflow state machine, working days, and absence history UI (Wave 2)
+- [ ] 02-03-PLAN.md — Fit note upload, secure storage, access control, and expiry tracking (Wave 3)
+- [ ] 02-04-PLAN.md — Return-to-work meetings, structured questionnaire, and manager guidance system (Wave 3)
+- [ ] 02-05-PLAN.md — Notification service, email templates, absence calendar, and dashboard integration (Wave 4)
 
 ### Phase 3: Monitoring & Intelligence
 **Goal**: Organisations can monitor absence patterns, detect trigger points, access analytics dashboards, and coordinate with external occupational health providers
@@ -72,5 +74,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Access | 5/5 | ✓ Complete | 2026-02-14 |
-| 2. Sickness Lifecycle | 0/3 | Not started | - |
+| 2. Sickness Lifecycle | 0/5 | Not started | - |
 | 3. Monitoring & Intelligence | 0/3 | Not started | - |
