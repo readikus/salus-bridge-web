@@ -96,6 +96,25 @@ export class UserRoleRepository {
   }
 
   /**
+   * Find all users with a specific role in an organisation.
+   * Returns email and userId for each matching user.
+   */
+  static async findUsersByRole(
+    organisationId: string,
+    role: UserRole,
+  ): Promise<{ email: string; userId: string }[]> {
+    const result = await pool.query(
+      `SELECT u.email, u.id AS "userId"
+      FROM user_roles ur
+      INNER JOIN users u ON ur.user_id = u.id
+      WHERE ur.organisation_id = $1 AND ur.role = $2`,
+      [organisationId, role],
+    );
+
+    return result.rows;
+  }
+
+  /**
    * Check if a user has a specific role in an organisation.
    */
   static async hasRole(userId: string, organisationId: string, role: string): Promise<boolean> {

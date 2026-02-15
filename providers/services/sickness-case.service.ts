@@ -1,7 +1,10 @@
 import { SicknessCaseRepository, SicknessCaseFilters } from "@/providers/repositories/sickness-case.repository";
 import { CaseTransitionRepository } from "@/providers/repositories/case-transition.repository";
+import { EmployeeRepository } from "@/providers/repositories/employee.repository";
+import { OrganisationRepository } from "@/providers/repositories/organisation.repository";
 import { EncryptionService } from "@/providers/services/encryption.service";
 import { AuditLogService } from "@/providers/services/audit-log.service";
+import { NotificationService } from "@/providers/services/notification.service";
 import { TenantService } from "@/providers/services/tenant.service";
 import { WorkingDaysService } from "@/providers/services/working-days.service";
 import { createSicknessCaseSchema, CreateSicknessCaseInput } from "@/schemas/sickness-case";
@@ -69,6 +72,23 @@ export class SicknessCaseService {
         absenceEndDate: parsed.absenceEndDate,
       },
     });
+
+    // Fire-and-forget: notify manager when sickness is reported (NOTF-01)
+    try {
+      const managerInfo = await EmployeeRepository.getManagerInfo(parsed.employeeId);
+      if (managerInfo) {
+        const org = await OrganisationRepository.findById(organisationId);
+        const orgName = org?.name || "Your Organisation";
+        await NotificationService.notifySicknessReported(
+          { id: sicknessCase.id, absenceStartDate: parsed.absenceStartDate },
+          { email: managerInfo.email, userId: managerInfo.userId },
+          orgName,
+          organisationId,
+        );
+      }
+    } catch (notifError) {
+      console.error("[SicknessCaseService] Failed to send sickness reported notification:", notifError);
+    }
 
     return sicknessCase;
   }

@@ -1,7 +1,10 @@
 import { RtwMeetingRepository } from "@/providers/repositories/rtw-meeting.repository";
 import { SicknessCaseRepository } from "@/providers/repositories/sickness-case.repository";
+import { EmployeeRepository } from "@/providers/repositories/employee.repository";
+import { OrganisationRepository } from "@/providers/repositories/organisation.repository";
 import { EncryptionService } from "@/providers/services/encryption.service";
 import { AuditLogService } from "@/providers/services/audit-log.service";
+import { NotificationService } from "@/providers/services/notification.service";
 import { TenantService } from "@/providers/services/tenant.service";
 import { WorkflowService } from "@/providers/services/workflow.service";
 import { RtwMeeting } from "@/types/database";
@@ -61,6 +64,24 @@ export class RtwMeetingService {
         scheduledDate,
       },
     });
+
+    // Fire-and-forget: notify employee about scheduled RTW meeting (NOTF-03)
+    try {
+      const employeeEmail = await EmployeeRepository.getEmployeeEmail(sicknessCase.employeeId);
+      if (employeeEmail) {
+        const employee = await EmployeeRepository.findById(sicknessCase.employeeId);
+        const org = await OrganisationRepository.findById(organisationId);
+        const orgName = org?.name || "Your Organisation";
+        await NotificationService.notifyRtwScheduled(
+          { sicknessCaseId: caseId, scheduledDate },
+          { email: employeeEmail, userId: employee?.userId || undefined },
+          orgName,
+          organisationId,
+        );
+      }
+    } catch (notifError) {
+      console.error("[RtwMeetingService] Failed to send RTW meeting notification:", notifError);
+    }
 
     return meeting;
   }

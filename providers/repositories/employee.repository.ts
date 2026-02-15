@@ -450,6 +450,28 @@ export class EmployeeRepository {
   }
 
   /**
+   * Get the manager's email and user ID for an employee.
+   * Returns null if the employee has no manager assigned.
+   */
+  static async getManagerInfo(
+    employeeId: string,
+  ): Promise<{ email: string; userId: string; organisationId: string } | null> {
+    const result = await pool.query(
+      `SELECT
+        u.email,
+        u.id AS "userId",
+        e.organisation_id AS "organisationId"
+      FROM employees e
+      INNER JOIN employees m ON e.manager_id = m.id
+      INNER JOIN users u ON m.user_id = u.id
+      WHERE e.id = $1`,
+      [employeeId],
+    );
+
+    return result.rows[0] || null;
+  }
+
+  /**
    * Get all data held about an employee for SAR readiness (COMP-05).
    * Returns personal info, roles, and audit log entries about them.
    */
