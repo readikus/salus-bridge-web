@@ -1,18 +1,24 @@
 "use client";
 
 import React, { useState, useCallback, useRef } from "react";
+import * as XLSX from "xlsx";
+import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { fetchImportEmployees } from "@/actions/employees";
+import { fetchImportEmployeesWithMapping } from "@/actions/employees";
 import { ImportResult, ErrorRow, SkippedRow, UnmatchedManager } from "@/schemas/csv-import";
+import { findBestColumnMapping, applyColumnMapping, AppFieldKey } from "@/utils/column-mapping";
+import { ColumnMappingStep } from "./column-mapping-step";
+
+const ACCEPTED_EXTENSIONS = [".csv", ".xlsx", ".xls"];
 
 interface Props {
   organisationId: string;
   onComplete?: () => void;
 }
 
-type WizardStep = "upload" | "importing" | "results";
+type WizardStep = "upload" | "mapping" | "importing" | "results";
 
 export function CsvImportWizard({ organisationId, onComplete }: Props) {
   const [step, setStep] = useState<WizardStep>("upload");
@@ -23,9 +29,22 @@ export function CsvImportWizard({ organisationId, onComplete }: Props) {
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // New state for column mapping flow
+  const [parsedHeaders, setParsedHeaders] = useState<string[]>([]);
+  const [parsedRows, setParsedRows] = useState<Record<string, string>[]>([]);
+  const [columnMapping, setColumnMapping] = useState<Record<AppFieldKey, string | null>>({
+    first_name: null,
+    last_name: null,
+    email: null,
+    job_title: null,
+    department: null,
+    manager_email: null,
+  });
+
   const handleFileSelect = useCallback((selectedFile: File) => {
-    if (!selectedFile.name.toLowerCase().endsWith(".csv")) {
-      setHasError("Please select a .csv file");
+    const ext = selectedFile.name.toLowerCase();
+    if (!ACCEPTED_EXTENSIONS.some((e) => ext.endsWith(e))) {
+      setHasError("Please select a .csv, .xlsx, or .xls file");
       return;
     }
     if (selectedFile.size > 5 * 1024 * 1024) {
@@ -64,32 +83,121 @@ export function CsvImportWizard({ organisationId, onComplete }: Props) {
     [handleFileSelect],
   );
 
-  const handleImport = useCallback(async () => {
+  const handleFileParse = useCallback(async () => {
     if (!file) return;
 
     setIsLoading(true);
     setHasError(null);
-    setStep("importing");
 
     try {
-      const importResult = await fetchImportEmployees(file);
-      setResult(importResult);
-      setStep("results");
+      const fileName = file.name.toLowerCase();
+
+      if (fileName.endsWith(".csv")) {
+        // Parse CSV client-side with PapaParse (keep original headers)
+        const text = await file.text();
+        const parsed = Papa.parse<Record<string, string>>(text, {
+          header: true,
+          skipEmptyLines: true,
+        });
+
+        const headers = parsed.meta.fields || [];
+        setParsedHeaders(headers);
+        setParsedRows(parsed.data);
+
+        const mapping = findBestColumnMapping(headers);
+        setColumnMapping(mapping);
+      } else {
+        // Parse Excel file using SheetJS
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const firstSheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[firstSheetName];
+        const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, { raw: false, defval: "" });
+
+        if (rows.length === 0) {
+          setHasError("The file appears to be empty");
+          setIsLoading(false);
+          return;
+        }
+
+        const headers = Object.keys(rows[0]);
+        setParsedHeaders(headers);
+        setParsedRows(rows);
+
+        const mapping = findBestColumnMapping(headers);
+        setColumnMapping(mapping);
+      }
+
+      setStep("mapping");
     } catch (error: any) {
-      setHasError(error.message || "Import failed");
-      setStep("upload");
+      setHasError(error.message || "Failed to parse file");
     } finally {
       setIsLoading(false);
     }
   }, [file]);
 
+  const handleImport = useCallback(
+    async (confirmedMapping: Record<AppFieldKey, string | null>) => {
+      setColumnMapping(confirmedMapping);
+      setIsLoading(true);
+      setHasError(null);
+      setStep("importing");
+
+      try {
+        // Filter out null mappings for the API call
+        const activeMapping: Record<string, string> = {};
+        for (const [key, value] of Object.entries(confirmedMapping)) {
+          if (value !== null) {
+            activeMapping[key] = value;
+          }
+        }
+
+        const importResult = await fetchImportEmployeesWithMapping(parsedRows, activeMapping);
+        setResult(importResult);
+        setStep("results");
+      } catch (error: any) {
+        setHasError(error.message || "Import failed");
+        setStep("mapping");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [parsedRows],
+  );
+
   const handleReset = useCallback(() => {
     setFile(null);
     setResult(null);
     setHasError(null);
+    setParsedHeaders([]);
+    setParsedRows([]);
+    setColumnMapping({
+      first_name: null,
+      last_name: null,
+      email: null,
+      job_title: null,
+      department: null,
+      manager_email: null,
+    });
     setStep("upload");
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
+
+  // Mapping step
+  if (step === "mapping") {
+    return (
+      <div className="space-y-4">
+        <ColumnMappingStep
+          fileHeaders={parsedHeaders}
+          detectedMapping={columnMapping}
+          sampleRows={parsedRows.slice(0, 3)}
+          onConfirm={handleImport}
+          onBack={() => setStep("upload")}
+        />
+        {hasError && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{hasError}</div>}
+      </div>
+    );
+  }
 
   if (step === "importing") {
     return (
@@ -266,9 +374,7 @@ export function CsvImportWizard({ organisationId, onComplete }: Props) {
           <Button onClick={handleReset} variant="outline">
             Import Another File
           </Button>
-          {onComplete && (
-            <Button onClick={onComplete}>Done</Button>
-          )}
+          {onComplete && <Button onClick={onComplete}>Done</Button>}
         </div>
       </div>
     );
@@ -278,10 +384,10 @@ export function CsvImportWizard({ organisationId, onComplete }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Import Employees from CSV</CardTitle>
+        <CardTitle>Import Employees</CardTitle>
         <CardDescription>
-          Upload a CSV file with employee data. Required columns: first_name, last_name, email. Optional: job_title,
-          department, manager_email.
+          Upload a CSV or Excel file with employee data. Required columns: first_name, last_name, email. Optional:
+          job_title, department, manager_email.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -306,8 +412,14 @@ export function CsvImportWizard({ organisationId, onComplete }: Props) {
           <p className="text-sm text-gray-600">
             <span className="font-medium text-gray-900">Click to upload</span> or drag and drop
           </p>
-          <p className="mt-1 text-xs text-gray-400">CSV files only, max 5MB</p>
-          <input ref={fileInputRef} type="file" accept=".csv" onChange={handleInputChange} className="hidden" />
+          <p className="mt-1 text-xs text-gray-400">CSV or Excel files, max 5MB</p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleInputChange}
+            className="hidden"
+          />
         </div>
 
         {/* Selected File */}
@@ -341,23 +453,24 @@ export function CsvImportWizard({ organisationId, onComplete }: Props) {
         )}
 
         {/* Error Message */}
-        {hasError && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{hasError}</div>
-        )}
+        {hasError && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{hasError}</div>}
 
-        {/* Import Button */}
-        <Button onClick={handleImport} disabled={!file || isLoading} className="w-full">
-          {isLoading ? "Importing..." : "Import Employees"}
+        {/* Continue Button */}
+        <Button onClick={handleFileParse} disabled={!file || isLoading} className="w-full">
+          {isLoading ? "Parsing file..." : "Continue"}
         </Button>
 
-        {/* CSV Template Guide */}
+        {/* File Format Guide */}
         <div className="rounded-lg bg-gray-50 p-4">
-          <p className="mb-2 text-sm font-medium text-gray-700">CSV Format</p>
+          <p className="mb-2 text-sm font-medium text-gray-700">Expected Format (CSV or Excel)</p>
           <code className="block whitespace-pre-wrap text-xs text-gray-500">
             first_name,last_name,email,job_title,department,manager_email{"\n"}
             John,Doe,john@example.com,Engineer,Engineering,jane@example.com{"\n"}
             Jane,Smith,jane@example.com,Manager,Engineering,
           </code>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Column names are matched automatically -- "Surname", "Email Address", "Position", etc. are all recognized.
+          </p>
         </div>
       </CardContent>
     </Card>
