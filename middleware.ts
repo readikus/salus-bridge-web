@@ -1,46 +1,48 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
-
-const auth0 = new Auth0Client();
+import { createMiddlewareClient } from "@/providers/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  // Let Auth0 SDK handle auth routes (/auth/login, /auth/logout, /auth/callback, /auth/profile)
-  const authResponse = await auth0.middleware(request);
+  const response = NextResponse.next({
+    request: { headers: request.headers },
+  });
 
-  // For Auth0 routes, return the Auth0 response directly
-  if (request.nextUrl.pathname.startsWith("/auth/")) {
-    return authResponse;
-  }
+  const supabase = createMiddlewareClient(request, response);
 
   // Public routes — pass through without auth check
   const isPublicPath =
     request.nextUrl.pathname === "/" ||
+    request.nextUrl.pathname === "/login" ||
     request.nextUrl.pathname.startsWith("/invite/") ||
     request.nextUrl.pathname === "/invite" ||
-    request.nextUrl.pathname.startsWith("/api/auth/");
+    request.nextUrl.pathname.startsWith("/api/auth/") ||
+    request.nextUrl.pathname.startsWith("/api/waitlist") ||
+    request.nextUrl.pathname.startsWith("/auth/");
+
+  // Use getUser() (not getSession()) per Supabase best practices — validates JWT server-side
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (isPublicPath) {
-    return authResponse;
+    // If user is logged in and hits /login, redirect to dashboard
+    if (user && request.nextUrl.pathname === "/login") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    return response;
   }
 
   // For all other routes (authenticated area), check for session
-  const session = await auth0.getSession(request);
-
-  if (!session) {
-    // Redirect to Auth0 login
-    const loginUrl = new URL("/auth/login", request.url);
+  if (!user) {
+    const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("returnTo", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // Attach user info to headers for server components
-  const response = authResponse;
-  if (session.user) {
-    response.headers.set("x-user-sub", session.user.sub);
-    if (session.user.email) {
-      response.headers.set("x-user-email", session.user.email);
-    }
+  response.headers.set("x-user-sub", user.id);
+  if (user.email) {
+    response.headers.set("x-user-email", user.email);
   }
 
   return response;
