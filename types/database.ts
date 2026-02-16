@@ -190,6 +190,92 @@ export interface PaginationOptions {
   offset?: number;
 }
 
+export interface TriggerConfig {
+  id: string;
+  organisationId: string;
+  name: string;
+  triggerType: string;
+  thresholdValue: number;
+  periodDays: number | null;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TriggerAlert {
+  id: string;
+  organisationId: string;
+  triggerConfigId: string;
+  employeeId: string;
+  sicknessCaseId: string | null;
+  triggeredValue: number;
+  acknowledgedBy: string | null;
+  acknowledgedAt: Date | null;
+  createdAt: Date;
+}
+
+export interface TriggerAlertWithDetails extends TriggerAlert {
+  triggerName: string;
+  triggerType: string;
+  thresholdValue: number;
+  employeeFirstName: string | null;
+  employeeLastName: string | null;
+}
+
+export interface OhProvider {
+  id: string;
+  organisationId: string;
+  name: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  address: string | null;
+  notes: string | null;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface OhReferral {
+  id: string;
+  organisationId: string;
+  sicknessCaseId: string;
+  employeeId: string;
+  providerId: string;
+  referredBy: string;
+  status: string;
+  reason: string;
+  urgency: string;
+  reportReceivedAt: Date | null;
+  reportNotesEncrypted: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface OhReferralWithDetails extends OhReferral {
+  employeeFirstName: string | null;
+  employeeLastName: string | null;
+  providerName: string;
+  absenceType: string | null;
+  absenceStartDate: string | null;
+}
+
+export interface OhReferralCommunication {
+  id: string;
+  referralId: string;
+  authorId: string;
+  direction: string;
+  message: string;
+  createdAt: Date;
+}
+
+export interface OhReferralCommunicationWithAuthor extends OhReferralCommunication {
+  authorFirstName: string | null;
+  authorLastName: string | null;
+  authorEmail: string;
+}
+
 export interface AuditFilters extends PaginationOptions {
   entity?: string;
   action?: string;

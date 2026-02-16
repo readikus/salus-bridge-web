@@ -19,6 +19,9 @@ export enum AuditAction {
   DOWNLOAD = "DOWNLOAD",
   SCHEDULE = "SCHEDULE",
   SEND = "SEND",
+  ALERT = "ALERT",
+  ACKNOWLEDGE = "ACKNOWLEDGE",
+  REFER = "REFER",
 }
 
 export enum AuditEntity {
@@ -32,6 +35,10 @@ export enum AuditEntity {
   RTW_MEETING = "RTW_MEETING",
   GUIDANCE = "GUIDANCE",
   NOTIFICATION = "NOTIFICATION",
+  TRIGGER_CONFIG = "TRIGGER_CONFIG",
+  TRIGGER_ALERT = "TRIGGER_ALERT",
+  OH_PROVIDER = "OH_PROVIDER",
+  OH_REFERRAL = "OH_REFERRAL",
 }
 
 export enum OrganisationStatus {
