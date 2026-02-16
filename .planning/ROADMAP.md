@@ -59,12 +59,12 @@ Plans:
   2. Organisation dashboard shows absence rates by team/department/org with month-over-month trends, enforcing minimum cohort sizes to prevent re-identification
   3. Reports are exportable as CSV and PDF
   4. HR or manager can create an OH referral for a sickness case, track its status, and log provider communication
-**Plans**: TBD
+**Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] 03-01: Trigger points and Bradford Factor
-- [ ] 03-02: Analytics dashboards and reporting
-- [ ] 03-03: Occupational health provider integration
+- [ ] 03-01-PLAN.md — Trigger points, Bradford Factor calculation, threshold configuration, and alert notifications (Wave 1)
+- [ ] 03-02-PLAN.md — Analytics dashboard with absence rates, trends, cohort enforcement, and CSV/PDF export (Wave 2)
+- [ ] 03-03-PLAN.md — Occupational health provider linking, referral lifecycle, and communication logging (Wave 1)
 
 ## Progress
 
