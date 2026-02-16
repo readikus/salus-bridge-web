@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 Phase: 2 of 3 (Sickness Lifecycle)
 Plan: 5 of 5 in current phase
 Status: Phase 2 Complete
-Last activity: 2026-02-15 -- Completed 02-05 (Notifications, Calendar & Dashboard)
+Last activity: 2026-02-16 - Completed quick task 1: Smart column mapping UI for CSV/Excel import with fuzzy matching and confirmation screen
 
 Progress: [█████████████░] 66%
 
@@ -87,6 +87,12 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Smart column mapping UI for CSV/Excel import with fuzzy matching and confirmation screen | 2026-02-16 | 10138d5 | [1-smart-column-mapping-ui-for-csv-excel-im](./quick/1-smart-column-mapping-ui-for-csv-excel-im/) |
 
 ### Blockers/Concerns
 
