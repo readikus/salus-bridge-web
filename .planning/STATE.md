@@ -9,17 +9,17 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 03-monitoring-and-intelligence (Plan 1/3)
-Plan: 03-01 (Trigger Points and Bradford Factor)
-Status: Plan 03-01 complete, continuing phase
-Last activity: 2026-02-16 - Completed 03-01 trigger points and Bradford Factor
+Phase: 03-monitoring-and-intelligence (Plan 3/3)
+Plan: 03-03 (OH Provider Integration)
+Status: Plan 03-03 complete, phase complete
+Last activity: 2026-02-16 - Completed 03-03 OH Provider Integration
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 9min
-- Total execution time: 1.7 hours
+- Total execution time: 1.8 hours
 
 **By Phase:**
 
@@ -27,7 +27,7 @@ Last activity: 2026-02-16 - Completed 03-01 trigger points and Bradford Factor
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
 | 02-sickness-lifecycle | 5/5 | 76min | 15min |
-| 03-monitoring-and-intelligence | 1/3 | 8min | 8min |
+| 03-monitoring-and-intelligence | 2/3 | 16min | 8min |
 
 *Updated after each plan completion*
 
@@ -53,6 +53,9 @@ Recent decisions affecting current work:
 - Bradford Factor uses simple weekday count (not WorkingDaysService) for ongoing cases
 - Alert deduplication by trigger_config_id + sickness_case_id pair
 - Trigger evaluation is fire-and-forget to avoid blocking case creation
+- Dialog-based forms for OH provider and referral CRUD (inline, not separate pages)
+- Report notes encrypted via EncryptionService on REPORT_RECEIVED transition
+- RLS on oh_referral_communications via EXISTS join through oh_referrals
 
 ### Pending Todos
 
@@ -73,4 +76,4 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 03-01-PLAN.md (Trigger Points and Bradford Factor)
+Stopped at: Completed 03-03-PLAN.md (OH Provider Integration)
