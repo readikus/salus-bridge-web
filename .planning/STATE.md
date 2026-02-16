@@ -80,6 +80,9 @@ Recent decisions affecting current work:
 - Calendar shows first name + last initial for privacy (not full employee names)
 - CSS grid calendar with Tailwind (no external calendar library)
 - Date range filtering uses overlap logic for calendar month queries
+- Client-side file parsing (PapaParse for CSV, SheetJS for Excel) before sending to server
+- Two-pass fuzzy matching for column aliases: exact match first, then substring
+- Dual API path for employee import: JSON body (new wizard) and FormData (backward compat)
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-15
-Stopped at: Completed 02-05-PLAN.md (Phase 2 complete)
-Resume file: .planning/phases/02-sickness-lifecycle/02-05-SUMMARY.md
+Last session: 2026-02-16
+Stopped at: Completed quick-1 (Smart Column Mapping UI for CSV/Excel Import)
+Resume file: .planning/quick/1-smart-column-mapping-ui-for-csv-excel-im/1-SUMMARY.md
