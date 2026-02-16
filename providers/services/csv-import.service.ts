@@ -24,6 +24,82 @@ import { AuditAction, AuditEntity, UserRole, EmployeeStatus } from "@/types/enum
  */
 export class CsvImportService {
   /**
+   * Validate a single row against the CsvRowSchema and check for duplicates.
+   * Shared between parseAndValidate (CSV) and parseAndValidateRows (pre-parsed).
+   */
+  private static async validateRow(
+    rawRow: Record<string, string>,
+    rowNumber: number,
+    organisationId: string,
+    seenEmails: Set<string>,
+    allRows: Record<string, string>[],
+    validRows: ValidatedRow[],
+    errorRows: ErrorRow[],
+    skippedDuplicates: SkippedRow[],
+    unmatchedManagers: UnmatchedManager[],
+  ): Promise<void> {
+    const parseResult = CsvRowSchema.safeParse(rawRow);
+
+    if (!parseResult.success) {
+      errorRows.push({
+        rowNumber,
+        data: rawRow,
+        errors: parseResult.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+      });
+      return;
+    }
+
+    const row = parseResult.data;
+    const email = row.email.toLowerCase();
+
+    if (seenEmails.has(email)) {
+      skippedDuplicates.push({
+        rowNumber,
+        email: row.email,
+        reason: "Duplicate email within file",
+      });
+      return;
+    }
+    seenEmails.add(email);
+
+    const existingEmployee = await EmployeeRepository.findByEmail(row.email, organisationId);
+    if (existingEmployee) {
+      skippedDuplicates.push({
+        rowNumber,
+        email: row.email,
+        reason: "Employee with this email already exists in organisation",
+      });
+      return;
+    }
+
+    if (row.manager_email && row.manager_email.trim()) {
+      const managerEmployee = await EmployeeRepository.findByEmail(row.manager_email, organisationId);
+      if (!managerEmployee) {
+        const managerInRows = allRows.some(
+          (r) => r.email && r.email.toLowerCase() === row.manager_email.toLowerCase(),
+        );
+        if (!managerInRows) {
+          unmatchedManagers.push({
+            rowNumber,
+            employeeEmail: row.email,
+            managerEmail: row.manager_email,
+          });
+        }
+      }
+    }
+
+    validRows.push({
+      rowNumber,
+      firstName: row.first_name,
+      lastName: row.last_name,
+      email: row.email,
+      jobTitle: row.job_title || "",
+      department: row.department || "",
+      managerEmail: row.manager_email || "",
+    });
+  }
+
+  /**
    * Parse CSV content and validate all rows.
    * Checks for required columns, validates each row, detects duplicates,
    * and flags unmatched manager references.
@@ -32,18 +108,14 @@ export class CsvImportService {
     csvContent: string,
     organisationId: string,
   ): Promise<CsvValidationResult> {
-    // Parse CSV using papaparse
     const parsed = Papa.parse<Record<string, string>>(csvContent, {
       header: true,
       skipEmptyLines: true,
       transformHeader: (header: string) => header.trim().toLowerCase().replace(/\s+/g, "_"),
     });
 
-    // Check for required columns
     const headers = parsed.meta.fields || [];
-    const missingColumns = REQUIRED_CSV_COLUMNS.filter(
-      (col) => !headers.includes(col),
-    );
+    const missingColumns = REQUIRED_CSV_COLUMNS.filter((col) => !headers.includes(col));
 
     if (missingColumns.length > 0) {
       return {
@@ -65,95 +137,78 @@ export class CsvImportService {
     const errorRows: ErrorRow[] = [];
     const skippedDuplicates: SkippedRow[] = [];
     const unmatchedManagers: UnmatchedManager[] = [];
-
-    // Track emails seen in this CSV for intra-file duplicate detection
     const seenEmails = new Set<string>();
 
     for (let i = 0; i < parsed.data.length; i++) {
-      const rawRow = parsed.data[i];
       const rowNumber = i + 2; // +2 because: 1-indexed + header row
-
-      // Validate with Zod schema
-      const parseResult = CsvRowSchema.safeParse(rawRow);
-
-      if (!parseResult.success) {
-        errorRows.push({
-          rowNumber,
-          data: rawRow,
-          errors: parseResult.error.errors.map(
-            (e) => `${e.path.join(".")}: ${e.message}`,
-          ),
-        });
-        continue;
-      }
-
-      const row = parseResult.data;
-      const email = row.email.toLowerCase();
-
-      // Check for duplicate within the CSV itself
-      if (seenEmails.has(email)) {
-        skippedDuplicates.push({
-          rowNumber,
-          email: row.email,
-          reason: "Duplicate email within CSV file",
-        });
-        continue;
-      }
-      seenEmails.add(email);
-
-      // Check for existing employee in the organisation
-      const existingEmployee = await EmployeeRepository.findByEmail(
-        row.email,
-        organisationId,
-      );
-      if (existingEmployee) {
-        skippedDuplicates.push({
-          rowNumber,
-          email: row.email,
-          reason: "Employee with this email already exists in organisation",
-        });
-        continue;
-      }
-
-      // Check manager email reference
-      if (row.manager_email && row.manager_email.trim()) {
-        const managerEmployee = await EmployeeRepository.findByEmail(
-          row.manager_email,
-          organisationId,
-        );
-        if (!managerEmployee) {
-          // Also check if manager email appears in the CSV (will be created)
-          const managerInCsv = parsed.data.some(
-            (r) => r.email && r.email.toLowerCase() === row.manager_email.toLowerCase(),
-          );
-          if (!managerInCsv) {
-            unmatchedManagers.push({
-              rowNumber,
-              employeeEmail: row.email,
-              managerEmail: row.manager_email,
-            });
-          }
-        }
-      }
-
-      validRows.push({
+      await this.validateRow(
+        parsed.data[i],
         rowNumber,
-        firstName: row.first_name,
-        lastName: row.last_name,
-        email: row.email,
-        jobTitle: row.job_title || "",
-        department: row.department || "",
-        managerEmail: row.manager_email || "",
-      });
+        organisationId,
+        seenEmails,
+        parsed.data,
+        validRows,
+        errorRows,
+        skippedDuplicates,
+        unmatchedManagers,
+      );
     }
 
-    return {
-      validRows,
-      errorRows,
-      skippedDuplicates,
-      unmatchedManagers,
-      totalRows: parsed.data.length,
-    };
+    return { validRows, errorRows, skippedDuplicates, unmatchedManagers, totalRows: parsed.data.length };
+  }
+
+  /**
+   * Validate pre-parsed rows (already column-mapped with app field keys).
+   * Used by the JSON import path -- skips PapaParse, goes straight to row validation.
+   */
+  static async parseAndValidateRows(
+    rows: Record<string, string>[],
+    organisationId: string,
+  ): Promise<CsvValidationResult> {
+    // Check that required columns exist in at least the first row
+    if (rows.length > 0) {
+      const firstRowKeys = Object.keys(rows[0]);
+      const missingColumns = REQUIRED_CSV_COLUMNS.filter((col) => !firstRowKeys.includes(col));
+
+      if (missingColumns.length > 0) {
+        return {
+          validRows: [],
+          errorRows: [
+            {
+              rowNumber: 0,
+              data: {},
+              errors: [`Missing required columns after mapping: ${missingColumns.join(", ")}`],
+            },
+          ],
+          skippedDuplicates: [],
+          unmatchedManagers: [],
+          totalRows: rows.length,
+        };
+      }
+    }
+
+    const validRows: ValidatedRow[] = [];
+    const errorRows: ErrorRow[] = [];
+    const skippedDuplicates: SkippedRow[] = [];
+    const unmatchedManagers: UnmatchedManager[] = [];
+    const seenEmails = new Set<string>();
+
+    for (let i = 0; i < rows.length; i++) {
+      const rowNumber = i + 2; // +2 for consistency with CSV (1-indexed + header)
+      await this.validateRow(
+        rows[i],
+        rowNumber,
+        organisationId,
+        seenEmails,
+        rows,
+        validRows,
+        errorRows,
+        skippedDuplicates,
+        unmatchedManagers,
+      );
+    }
+
+    return { validRows, errorRows, skippedDuplicates, unmatchedManagers, totalRows: rows.length };
   }
 
   /**

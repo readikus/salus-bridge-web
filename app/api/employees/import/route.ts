@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { AuthService } from "@/providers/services/auth.service";
 import { CsvImportService } from "@/providers/services/csv-import.service";
 import { AuditLogService } from "@/providers/services/audit-log.service";
 import { PERMISSIONS } from "@/constants/permissions";
 import { AuditAction, AuditEntity } from "@/types/enums";
-
-const auth0 = new Auth0Client();
+import { applyColumnMapping } from "@/utils/column-mapping";
+import { MappedImportPayload } from "@/schemas/csv-import";
+import { AppFieldKey } from "@/utils/column-mapping";
 
 /**
  * POST /api/employees/import
@@ -17,14 +18,9 @@ const auth0 = new Auth0Client();
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const organisationId = sessionUser.currentOrganisationId;
@@ -36,7 +32,72 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Parse multipart form data
+    const contentType = request.headers.get("content-type") || "";
+
+    // JSON path: pre-parsed rows with confirmed column mapping (new wizard)
+    if (contentType.includes("application/json")) {
+      const body = (await request.json()) as MappedImportPayload;
+
+      if (!body.rows || !Array.isArray(body.rows) || body.rows.length === 0) {
+        return NextResponse.json({ error: "No rows provided" }, { status: 400 });
+      }
+
+      if (!body.mapping || typeof body.mapping !== "object") {
+        return NextResponse.json({ error: "No column mapping provided" }, { status: 400 });
+      }
+
+      // Apply column mapping to normalize row keys to app field keys
+      const normalizedRows = applyColumnMapping(body.rows, body.mapping as Record<AppFieldKey, string | null>);
+
+      // Validate and import using pre-parsed rows
+      const validationResult = await CsvImportService.parseAndValidateRows(normalizedRows, organisationId);
+
+      if (validationResult.validRows.length === 0) {
+        return NextResponse.json({
+          result: {
+            created: [],
+            skippedDuplicates: validationResult.skippedDuplicates,
+            errors: validationResult.errorRows,
+            unmatchedManagers: validationResult.unmatchedManagers,
+            totalRows: validationResult.totalRows,
+          },
+        });
+      }
+
+      const importResult = await CsvImportService.importValidRows(
+        validationResult.validRows,
+        organisationId,
+        sessionUser.id,
+      );
+
+      const combinedResult = {
+        ...importResult,
+        skippedDuplicates: validationResult.skippedDuplicates,
+        errors: [...validationResult.errorRows, ...importResult.errors],
+        unmatchedManagers: [...validationResult.unmatchedManagers, ...importResult.unmatchedManagers],
+        totalRows: validationResult.totalRows,
+      };
+
+      await AuditLogService.log({
+        userId: sessionUser.id,
+        organisationId,
+        action: AuditAction.CREATE,
+        entity: AuditEntity.EMPLOYEE,
+        metadata: {
+          event: "csv_import_completed",
+          source: "mapped_json",
+          totalRows: combinedResult.totalRows,
+          created: combinedResult.created.length,
+          skippedDuplicates: combinedResult.skippedDuplicates.length,
+          errors: combinedResult.errors.length,
+          unmatchedManagers: combinedResult.unmatchedManagers.length,
+        },
+      });
+
+      return NextResponse.json({ result: combinedResult });
+    }
+
+    // FormData path: legacy CSV file upload (backward compat)
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -44,7 +105,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate file
     if (!file.name.toLowerCase().endsWith(".csv")) {
       return NextResponse.json({ error: "File must be a .csv file" }, { status: 400 });
     }
@@ -53,17 +113,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File must be under 5MB" }, { status: 400 });
     }
 
-    // Read file content
     const csvContent = await file.text();
 
     if (!csvContent.trim()) {
       return NextResponse.json({ error: "CSV file is empty" }, { status: 400 });
     }
 
-    // Step 1: Parse and validate
     const validationResult = await CsvImportService.parseAndValidate(csvContent, organisationId);
 
-    // If no valid rows, return validation result without importing
     if (validationResult.validRows.length === 0) {
       return NextResponse.json({
         result: {
@@ -76,26 +133,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Step 2: Import valid rows
     const importResult = await CsvImportService.importValidRows(
       validationResult.validRows,
       organisationId,
       sessionUser.id,
     );
 
-    // Combine validation-stage duplicates with import-stage results
     const combinedResult = {
       ...importResult,
       skippedDuplicates: validationResult.skippedDuplicates,
       errors: [...validationResult.errorRows, ...importResult.errors],
-      unmatchedManagers: [
-        ...validationResult.unmatchedManagers,
-        ...importResult.unmatchedManagers,
-      ],
+      unmatchedManagers: [...validationResult.unmatchedManagers, ...importResult.unmatchedManagers],
       totalRows: validationResult.totalRows,
     };
 
-    // Audit log the import action
     await AuditLogService.log({
       userId: sessionUser.id,
       organisationId,

@@ -3,10 +3,13 @@ import { z } from "zod";
 /**
  * Schema for CSV file upload validation.
  */
+const ACCEPTED_EXTENSIONS = [".csv", ".xlsx", ".xls"];
+
 export const CsvFileSchema = z.object({
-  fileName: z.string().refine((name) => name.toLowerCase().endsWith(".csv"), {
-    message: "File must be a .csv file",
-  }),
+  fileName: z.string().refine(
+    (name) => ACCEPTED_EXTENSIONS.some((ext) => name.toLowerCase().endsWith(ext)),
+    { message: "File must be a .csv, .xlsx, or .xls file" },
+  ),
   fileSize: z.number().max(5 * 1024 * 1024, "File must be under 5MB"),
 });
 
@@ -84,4 +87,17 @@ export interface ImportResult {
   errors: ErrorRow[];
   unmatchedManagers: UnmatchedManager[];
   totalRows: number;
+}
+
+/**
+ * Column mapping type: app field key -> original file header (or null if unmapped).
+ */
+export type ColumnMapping = Record<string, string | null>;
+
+/**
+ * Payload for JSON-based import with pre-parsed rows and confirmed column mapping.
+ */
+export interface MappedImportPayload {
+  rows: Record<string, string>[];
+  mapping: Record<string, string>;
 }

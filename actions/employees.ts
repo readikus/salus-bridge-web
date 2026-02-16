@@ -108,7 +108,30 @@ export async function fetchSendInvitation(employeeId: string): Promise<{ invitat
 }
 
 /**
- * Import employees from a CSV file (ORG-01).
+ * Import employees with pre-parsed rows and confirmed column mapping.
+ * Posts JSON payload instead of FormData -- used by the new import wizard.
+ */
+export async function fetchImportEmployeesWithMapping(
+  rows: Record<string, string>[],
+  mapping: Record<string, string>,
+): Promise<ImportResult> {
+  const res = await fetch("/api/employees/import", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rows, mapping }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to import employees");
+  }
+
+  const data = await res.json();
+  return data.result;
+}
+
+/**
+ * Import employees from a CSV file (ORG-01). Legacy FormData path.
  */
 export async function fetchImportEmployees(file: File): Promise<ImportResult> {
   const formData = new FormData();
