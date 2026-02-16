@@ -10,25 +10,34 @@ UK-first but designed for international expansion. Handles sensitive health data
 
 An employee can report sickness and be guided through a complete return-to-work cycle — with their manager receiving structured, empathetic guidance at every step.
 
+## Current Milestone: v1.1 Landing & Waitlist
+
+**Goal:** A polished landing page at `/` that serves as the front door for app.salusbridge.com — with full marketing content, login for invited users, and a waitlist for prospects.
+
+**Target features:**
+- Full landing page (hero, features, how it works, social proof, CTA)
+- Login form for invited users (Supabase email/password)
+- Waitlist form with database storage (name + email)
+- Evolved purple brand identity (same family, more modern)
+
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Platform admin can create and manage organisations — v1.0 Phase 1
+- ✓ Organisation admin can import employees via CSV with validation — v1.0 Phase 1
+- ✓ Role-based access (platform admin, org admin, manager, HR, employee) — v1.0 Phase 1
+- ✓ Employee or manager can initiate a sickness report — v1.0 Phase 2
+- ✓ Fit note tracking and documentation — v1.0 Phase 2
+- ✓ Guided return-to-work workflow — v1.0 Phase 2
+- ✓ Manager conversation guidance (scripted templates) — v1.0 Phase 2
 
 ### Active
 
-- [ ] Platform admin can create and manage organisations
-- [ ] Organisation admin can import employees via CSV with validation
-- [ ] Role-based access (platform admin, org admin, manager, HR, employee)
-- [ ] Employees access the platform via magic link (no password)
-- [ ] Employee or manager can initiate a sickness report
-- [ ] Fit note tracking and documentation
-- [ ] Guided return-to-work workflow
-- [ ] Manager conversation guidance (scripted templates, AI-enhanced later)
-- [ ] HR compliance oversight and documentation review
-- [ ] Analytics dashboard with absence trends and patterns
-- [ ] External provider linking and referral workflows
+- [ ] Full landing page with marketing content at `/`
+- [ ] Login form for invited users
+- [ ] Waitlist form with database storage
+- [ ] Evolved brand identity
 
 ### Out of Scope
 
@@ -37,12 +46,15 @@ An employee can report sickness and be guided through a complete return-to-work 
 - Predictive analytics / AI-driven absence prediction — requires data volume first
 - Automation workflows — manual-first, automate after patterns are proven
 - Mobile native app — web-first, responsive design sufficient for MVP
+- Trigger points & Bradford Factor — deferred from v1.0 Phase 3 to v1.2+
+- Analytics dashboards & reporting — deferred from v1.0 Phase 3 to v1.2+
+- OH provider integration — deferred from v1.0 Phase 3 to v1.2+
 
 ## Context
 
 - **Tech stack**: Next.js 16 (App Router), React 19, TypeScript, PostgreSQL on Supabase (direct pg, not SDK), Auth0, Tailwind/shadcn, deployed on Vercel
 - **Data sensitivity**: Special category health data under UK GDPR — fit notes, GP details, conditions. Requires audit logging, data minimisation, role-based access, secure document handling
-- **Authentication**: Auth0 with magic link flow for employees. Admin users may use email/password
+- **Authentication**: Supabase Auth with email/password for admin users. Invite-only access (no public sign up). Waitlist for prospects.
 - **AI guidance**: Hybrid approach — scripted templates for MVP with architecture ready for LLM enhancement. Covers early intervention prompts, manager conversation support, return-to-work recommendations
 - **Organisation model**: Admin-driven, organisation-centric. Platform admin creates orgs, org admins onboard employees via CSV import
 - **Target onboarding**: Organisation setup and employee import in under 5 minutes
@@ -67,4 +79,4 @@ An employee can report sickness and be guided through a complete return-to-work 
 | Both sickness reporting paths | Employee self-report and manager-initiated covers all real-world scenarios | — Pending |
 
 ---
-*Last updated: 2026-02-14 after initialization*
+*Last updated: 2026-02-16 after milestone v1.1 started*
