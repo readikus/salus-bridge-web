@@ -7,7 +7,7 @@ SalusBridge delivers a compliance-first workplace health coordination platform i
 ## Phases
 
 - [x] **Phase 1: Foundation & Access** - Multi-tenant platform with auth, RBAC, compliance infrastructure, and organisation/employee management _(completed 2026-02-14)_
-- [ ] **Phase 2: Sickness Lifecycle** - Complete sickness case flow from reporting through return-to-work, with manager guidance and notifications
+- [x] **Phase 2: Sickness Lifecycle** - Complete sickness case flow from reporting through return-to-work, with manager guidance and notifications _(completed 2026-02-15)_
 - [ ] **Phase 3: Monitoring & Intelligence** - Trigger points, analytics dashboards, and OH provider integration
 
 ## Phase Details
@@ -44,11 +44,11 @@ Plans:
 **Plans**: 5 plans (4 waves)
 
 Plans:
-- [ ] 02-01-PLAN.md — Database schema, RLS policies, constants, types, permissions, and Zod schemas (Wave 1)
-- [ ] 02-02-PLAN.md — Sickness case reporting, workflow state machine, working days, and absence history UI (Wave 2)
-- [ ] 02-03-PLAN.md — Fit note upload, secure storage, access control, and expiry tracking (Wave 3)
-- [ ] 02-04-PLAN.md — Return-to-work meetings, structured questionnaire, and manager guidance system (Wave 3)
-- [ ] 02-05-PLAN.md — Notification service, email templates, absence calendar, and dashboard integration (Wave 4)
+- [x] 02-01-PLAN.md — Database schema, RLS policies, constants, types, permissions, and Zod schemas (Wave 1)
+- [x] 02-02-PLAN.md — Sickness case reporting, workflow state machine, working days, and absence history UI (Wave 2)
+- [x] 02-03-PLAN.md — Fit note upload, secure storage, access control, and expiry tracking (Wave 3)
+- [x] 02-04-PLAN.md — Return-to-work meetings, structured questionnaire, and manager guidance system (Wave 3)
+- [x] 02-05-PLAN.md — Notification service, email templates, absence calendar, and dashboard integration (Wave 4)
 
 ### Phase 3: Monitoring & Intelligence
 **Goal**: Organisations can monitor absence patterns, detect trigger points, access analytics dashboards, and coordinate with external occupational health providers
@@ -74,5 +74,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Access | 5/5 | ✓ Complete | 2026-02-14 |
-| 2. Sickness Lifecycle | 0/5 | Not started | - |
+| 2. Sickness Lifecycle | 5/5 | ✓ Complete | 2026-02-15 |
 | 3. Monitoring & Intelligence | 0/3 | Not started | - |
