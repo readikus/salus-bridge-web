@@ -9,17 +9,17 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-16 - Completed quick task 2: Build the landing page homepage
+Phase: 03-monitoring-and-intelligence (Plan 1/3)
+Plan: 03-01 (Trigger Points and Bradford Factor)
+Status: Plan 03-01 complete, continuing phase
+Last activity: 2026-02-16 - Completed 03-01 trigger points and Bradford Factor
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 9min
-- Total execution time: 1.6 hours
+- Total execution time: 1.7 hours
 
 **By Phase:**
 
@@ -27,6 +27,7 @@ Last activity: 2026-02-16 - Completed quick task 2: Build the landing page homep
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
 | 02-sickness-lifecycle | 5/5 | 76min | 15min |
+| 03-monitoring-and-intelligence | 1/3 | 8min | 8min |
 
 *Updated after each plan completion*
 
@@ -49,6 +50,9 @@ Recent decisions affecting current work:
 - Client-side file parsing (PapaParse for CSV, SheetJS for Excel) before sending to server
 - Two-pass fuzzy matching for column aliases: exact match first, then substring
 - Dual API path for employee import: JSON body (new wizard) and FormData (backward compat)
+- Bradford Factor uses simple weekday count (not WorkingDaysService) for ongoing cases
+- Alert deduplication by trigger_config_id + sickness_case_id pair
+- Trigger evaluation is fire-and-forget to avoid blocking case creation
 
 ### Pending Todos
 
@@ -69,4 +73,4 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed quick-2 (landing page)
+Stopped at: Completed 03-01-PLAN.md (Trigger Points and Bradford Factor)
