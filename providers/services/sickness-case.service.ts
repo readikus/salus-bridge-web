@@ -5,6 +5,7 @@ import { OrganisationRepository } from "@/providers/repositories/organisation.re
 import { EncryptionService } from "@/providers/services/encryption.service";
 import { AuditLogService } from "@/providers/services/audit-log.service";
 import { NotificationService } from "@/providers/services/notification.service";
+import { TriggerService } from "@/providers/services/trigger.service";
 import { TenantService } from "@/providers/services/tenant.service";
 import { WorkingDaysService } from "@/providers/services/working-days.service";
 import { createSicknessCaseSchema, CreateSicknessCaseInput } from "@/schemas/sickness-case";
@@ -88,6 +89,13 @@ export class SicknessCaseService {
       }
     } catch (notifError) {
       console.error("[SicknessCaseService] Failed to send sickness reported notification:", notifError);
+    }
+
+    // Fire-and-forget: evaluate trigger rules on case creation
+    try {
+      await TriggerService.evaluate(parsed.employeeId, organisationId, sicknessCase.id);
+    } catch (triggerError) {
+      console.error("[TriggerService] evaluation failed:", triggerError);
     }
 
     return sicknessCase;

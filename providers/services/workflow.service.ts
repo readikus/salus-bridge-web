@@ -3,6 +3,7 @@ import { SicknessCaseRepository } from "@/providers/repositories/sickness-case.r
 import { CaseTransitionRepository } from "@/providers/repositories/case-transition.repository";
 import { OrganisationRepository } from "@/providers/repositories/organisation.repository";
 import { AuditLogService } from "@/providers/services/audit-log.service";
+import { TriggerService } from "@/providers/services/trigger.service";
 import { TenantService } from "@/providers/services/tenant.service";
 import { WorkingDaysService } from "@/providers/services/working-days.service";
 import { OrgSettingsSchema } from "@/schemas/organisation";
@@ -89,6 +90,16 @@ export class WorkflowService {
 
       // Check long-term threshold (WRKF-04)
       await WorkflowService.checkLongTermThreshold(updatedCase, organisationId, client);
+
+      // Fire-and-forget: evaluate trigger rules on status transition
+      // Evaluate on TRACKING (case confirmed) and CLOSED (end date/working days set)
+      if (newStatus === SicknessState.TRACKING || newStatus === SicknessState.CLOSED) {
+        try {
+          await TriggerService.evaluate(updatedCase.employeeId, organisationId, caseId, client);
+        } catch (triggerError) {
+          console.error("[TriggerService] evaluation failed:", triggerError);
+        }
+      }
 
       return updatedCase;
     });
