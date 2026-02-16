@@ -11,6 +11,8 @@ import {
   ClipboardPlus,
   CalendarDays,
   Calendar,
+  AlertTriangle,
+  FileText,
   LucideIcon,
 } from "lucide-react";
 
@@ -85,6 +87,24 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/my-profile",
     icon: UserCircle,
     roles: [UserRole.EMPLOYEE],
+  },
+  {
+    label: "Triggers",
+    href: "/triggers",
+    icon: AlertTriangle,
+    roles: [UserRole.PLATFORM_ADMIN, UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER],
+  },
+  {
+    label: "OH Providers",
+    href: "/oh-providers",
+    icon: Building2,
+    roles: [UserRole.PLATFORM_ADMIN, UserRole.ORG_ADMIN, UserRole.HR],
+  },
+  {
+    label: "Referrals",
+    href: "/oh-referrals",
+    icon: FileText,
+    roles: [UserRole.PLATFORM_ADMIN, UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER],
   },
   {
     label: "Settings",
