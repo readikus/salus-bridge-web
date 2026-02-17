@@ -39,6 +39,7 @@ export enum AuditEntity {
   TRIGGER_ALERT = "TRIGGER_ALERT",
   OH_PROVIDER = "OH_PROVIDER",
   OH_REFERRAL = "OH_REFERRAL",
+  ANALYTICS = "ANALYTICS",
 }
 
 export enum OrganisationStatus {
