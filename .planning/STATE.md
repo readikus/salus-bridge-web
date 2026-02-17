@@ -9,17 +9,17 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 03-monitoring-and-intelligence (Plan 3/3)
-Plan: 03-03 (OH Provider Integration)
-Status: Plan 03-03 complete, phase complete
-Last activity: 2026-02-16 - Completed 03-03 OH Provider Integration
+Phase: 03-monitoring-and-intelligence — COMPLETE
+Plan: All 3/3 complete, verified (16/16 must-haves passed)
+Status: Milestone v1.0 complete — all 3 phases done
+Last activity: 2026-02-17 — Phase 3 verified and complete
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 9min
-- Total execution time: 1.8 hours
+- Total execution time: 2.0 hours
 
 **By Phase:**
 
@@ -27,7 +27,7 @@ Last activity: 2026-02-16 - Completed 03-03 OH Provider Integration
 |-------|-------|-------|----------|
 | 01-foundation-and-access | 5/5 | 33min | 7min |
 | 02-sickness-lifecycle | 5/5 | 76min | 15min |
-| 03-monitoring-and-intelligence | 2/3 | 16min | 8min |
+| 03-monitoring-and-intelligence | 3/3 | 26min | 9min |
 
 *Updated after each plan completion*
 
@@ -42,7 +42,9 @@ Recent decisions affecting current work:
 - Invite-only access model (no public sign up)
 - Waitlist form for prospect capture (database table)
 - Evolved purple brand identity for landing page
-- Phase 3 (trigger points, analytics, OH providers) deferred from v1.0 to v1.2+
+- CSS-only bar charts for analytics (Tailwind divs) instead of charting library
+- PDF export via print-ready HTML with @media print styles
+- MINIMUM_COHORT_SIZE=5 for analytics privacy enforcement
 - Compliance-first build order: audit logging, encryption, and RBAC must exist before any health data flows
 - Trigger-based audit log immutability (instead of REVOKE) for Supabase superuser connections
 - RLS via session variables (app.current_organisation_id) set per-request
@@ -75,5 +77,5 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-16
-Stopped at: Completed 03-03-PLAN.md (OH Provider Integration)
+Last session: 2026-02-17
+Stopped at: Milestone v1.0 complete — all 3 phases executed and verified

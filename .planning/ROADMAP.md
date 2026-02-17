@@ -8,7 +8,7 @@ SalusBridge delivers a compliance-first workplace health coordination platform i
 
 - [x] **Phase 1: Foundation & Access** - Multi-tenant platform with auth, RBAC, compliance infrastructure, and organisation/employee management _(completed 2026-02-14)_
 - [x] **Phase 2: Sickness Lifecycle** - Complete sickness case flow from reporting through return-to-work, with manager guidance and notifications _(completed 2026-02-15)_
-- [ ] **Phase 3: Monitoring & Intelligence** - Trigger points, analytics dashboards, and OH provider integration
+- [x] **Phase 3: Monitoring & Intelligence** - Trigger points, analytics dashboards, and OH provider integration _(completed 2026-02-17)_
 
 ## Phase Details
 
@@ -62,9 +62,9 @@ Plans:
 **Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] 03-01-PLAN.md — Trigger points, Bradford Factor calculation, threshold configuration, and alert notifications (Wave 1)
-- [ ] 03-02-PLAN.md — Analytics dashboard with absence rates, trends, cohort enforcement, and CSV/PDF export (Wave 2)
-- [ ] 03-03-PLAN.md — Occupational health provider linking, referral lifecycle, and communication logging (Wave 1)
+- [x] 03-01-PLAN.md — Trigger points, Bradford Factor calculation, threshold configuration, and alert notifications (Wave 1)
+- [x] 03-02-PLAN.md — Analytics dashboard with absence rates, trends, cohort enforcement, and CSV/PDF export (Wave 2)
+- [x] 03-03-PLAN.md — Occupational health provider linking, referral lifecycle, and communication logging (Wave 1)
 
 ## Progress
 
@@ -75,4 +75,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. Foundation & Access | 5/5 | ✓ Complete | 2026-02-14 |
 | 2. Sickness Lifecycle | 5/5 | ✓ Complete | 2026-02-15 |
-| 3. Monitoring & Intelligence | 0/3 | Not started | - |
+| 3. Monitoring & Intelligence | 3/3 | ✓ Complete | 2026-02-17 |
