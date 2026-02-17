@@ -13,6 +13,7 @@ import {
   Calendar,
   AlertTriangle,
   FileText,
+  BarChart3,
   LucideIcon,
 } from "lucide-react";
 
@@ -104,6 +105,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Referrals",
     href: "/oh-referrals",
     icon: FileText,
+    roles: [UserRole.PLATFORM_ADMIN, UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER],
+  },
+  {
+    label: "Analytics",
+    href: "/analytics",
+    icon: BarChart3,
     roles: [UserRole.PLATFORM_ADMIN, UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER],
   },
   {
