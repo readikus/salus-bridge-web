@@ -10,15 +10,16 @@ UK-first but designed for international expansion. Handles sensitive health data
 
 An employee can report sickness and be guided through a complete return-to-work cycle — with their manager receiving structured, empathetic guidance at every step.
 
-## Current Milestone: v1.1 Landing & Waitlist
+## Current Milestone: v1.2 Absence Timeline Engine
 
-**Goal:** A polished landing page at `/` that serves as the front door for app.salusbridge.com — with full marketing content, login for invited users, and a waitlist for prospects.
+**Goal:** A configurable milestone-based workflow engine that automatically drives absence management — from Day 1 notifications through Week 52 capability review — with a compliance dashboard showing real-time risk status across all active cases.
 
 **Target features:**
-- Full landing page (hero, features, how it works, social proof, CTA)
-- Login form for invited users (Supabase email/password)
-- Waitlist form with database storage (name + email)
-- Evolved purple brand identity (same family, more modern)
+- Configurable absence timeline with auto-triggered milestone actions (Day 1, 3, 7, Week 2-4, 6, every 4 weeks, Week 52)
+- Communication log on sickness cases for tracking all employer-employee contact
+- Compliance dashboard with red/yellow/green risk indicators per case
+- GP details storage and medical records consent workflow
+- Org-level override of default milestone timings
 
 ## Requirements
 
@@ -31,24 +32,31 @@ An employee can report sickness and be guided through a complete return-to-work 
 - ✓ Fit note tracking and documentation — v1.0 Phase 2
 - ✓ Guided return-to-work workflow — v1.0 Phase 2
 - ✓ Manager conversation guidance (scripted templates) — v1.0 Phase 2
+- ✓ Trigger points & Bradford Factor with alert notifications — v1.0 Phase 3
+- ✓ Analytics dashboard with cohort privacy and CSV/PDF export — v1.0 Phase 3
+- ✓ OH provider integration with referral lifecycle — v1.0 Phase 3
+- ✓ Landing page with marketing content — v1.1
 
 ### Active
 
-- [ ] Full landing page with marketing content at `/`
-- [ ] Login form for invited users
-- [ ] Waitlist form with database storage
-- [ ] Evolved brand identity
+- [ ] Configurable absence timeline engine with milestone-based actions
+- [ ] Communication log on sickness cases
+- [ ] Compliance dashboard with risk indicators
+- [ ] GP details and medical records consent
+- [ ] Document templates (GP report request, Plan of Action, meeting forms, BTW report) — v1.3
+- [ ] Plan of Action with collaborative sign-off — v1.3
+- [ ] Auto-scheduled evaluation meetings — v1.3
+- [ ] Reintegration report generator — v1.3
+- [ ] Capability review at Week 52 — v1.3
 
 ### Out of Scope
 
 - Advanced provider marketplace — future expansion, not core to MVP
 - Deep NHS integration — future phase, UK-first approach sufficient for now
 - Predictive analytics / AI-driven absence prediction — requires data volume first
-- Automation workflows — manual-first, automate after patterns are proven
 - Mobile native app — web-first, responsive design sufficient for MVP
-- Trigger points & Bradford Factor — deferred from v1.0 Phase 3 to v1.2+
-- Analytics dashboards & reporting — deferred from v1.0 Phase 3 to v1.2+
-- OH provider integration — deferred from v1.0 Phase 3 to v1.2+
+- HRIS integration API — explicitly out of scope per founder discussion
+- Org-customisable document templates — standard templates only for now
 
 ## Context
 
@@ -79,4 +87,4 @@ An employee can report sickness and be guided through a complete return-to-work 
 | Both sickness reporting paths | Employee self-report and manager-initiated covers all real-world scenarios | — Pending |
 
 ---
-*Last updated: 2026-02-16 after milestone v1.1 started*
+*Last updated: 2026-02-18 after milestone v1.2 started*

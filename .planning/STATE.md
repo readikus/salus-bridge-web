@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** An employee can report sickness and be guided through a complete return-to-work cycle -- with their manager receiving structured, empathetic guidance at every step.
-**Current focus:** Milestone v1.1 — Landing & Waitlist
+**Current focus:** Milestone v1.2 — Absence Timeline Engine
 
 ## Current Position
 
-Phase: 03-monitoring-and-intelligence — COMPLETE
-Plan: All 3/3 complete, verified (16/16 must-haves passed)
-Status: Milestone v1.0 complete — all 3 phases done
-Last activity: 2026-02-17 — Phase 3 verified and complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-18 — Milestone v1.2 started
 
 ## Performance Metrics
 
@@ -77,5 +77,5 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-17
-Stopped at: Milestone v1.0 complete — all 3 phases executed and verified
+Last session: 2026-02-18
+Stopped at: Starting milestone v1.2 — defining requirements

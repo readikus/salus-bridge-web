@@ -3,7 +3,7 @@
 ## v1.0 — Foundation & Sickness Lifecycle
 
 **Shipped:** 2026-02-15
-**Phases:** 1-2 (Phase 3 deferred to v1.2+)
+**Phases:** 1-3
 
 ### What shipped
 - Multi-tenant platform with Supabase Auth, RBAC, audit logging, encryption
@@ -12,10 +12,20 @@
 - Manager guidance system with contextual scripts
 - Notification service with email templates
 - Absence calendar and dashboard integration
-
-### What was deferred
-- Phase 3: Trigger points & Bradford Factor, analytics dashboards, OH provider integration → v1.2+
+- Trigger points & Bradford Factor with alert notifications
+- Analytics dashboard with absence rates, trends, cohort privacy, CSV/PDF export
+- OH provider integration with referral lifecycle and communication logging
 
 ### Key stats
-- 10 plans executed across 2 phases
-- ~1.5 hours total execution time
+- 13 plans executed across 3 phases
+- ~2.0 hours total execution time
+
+## v1.1 — Landing & Waitlist
+
+**Shipped:** 2026-02-16
+**Phases:** Quick tasks (no formal phases)
+
+### What shipped
+- Landing page with hero, features, how-it-works, social proof, CTA
+- Smart column mapping UI for CSV/Excel import
+- Waitlist form groundwork
