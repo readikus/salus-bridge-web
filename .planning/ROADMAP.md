@@ -60,11 +60,12 @@ Plans:
   2. Org admin can override default milestone timings (e.g. change "Day 3" to "Day 5") for their organisation, and new cases use the custom timings
   3. Employee can add their GP name and address to their profile
   4. Employee can complete a consent form granting permission for medical records access, and HR can see the consent status
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — TBD
-- [ ] 04-02-PLAN.md — TBD
+- [ ] 04-01-PLAN.md — Database schema, types, enums, permissions, constants, and Zod schemas for milestones and GP/consent
+- [ ] 04-02-PLAN.md — Milestone timeline engine: repository, service, API routes, org admin config UI, and case timeline component
+- [ ] 04-03-PLAN.md — GP details and medical records consent: repository, service, API routes, forms, and profile integration
 
 #### Phase 5: Milestone Actions & Communication Log
 **Goal**: The timeline engine automatically triggers the right notifications, prompts, and escalations at each milestone -- and all employer-employee contact is recorded in an auditable communication log
@@ -105,6 +106,6 @@ Phases execute in numeric order: 4 -> 5 -> 6
 | 1. Foundation & Access | v1.0 | 5/5 | Complete | 2026-02-14 |
 | 2. Sickness Lifecycle | v1.0 | 5/5 | Complete | 2026-02-15 |
 | 3. Monitoring & Intelligence | v1.0 | 3/3 | Complete | 2026-02-17 |
-| 4. Timeline Engine & GP Details | v1.2 | 0/? | Not started | - |
+| 4. Timeline Engine & GP Details | v1.2 | 0/3 | Not started | - |
 | 5. Milestone Actions & Communication Log | v1.2 | 0/? | Not started | - |
 | 6. Compliance Dashboard | v1.2 | 0/? | Not started | - |
