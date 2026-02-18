@@ -262,31 +262,31 @@ All shipped and verified across Phases 1-3.
 | PROV-02 | Phase 3 | Complete |
 | PROV-03 | Phase 3 | Complete |
 | PROV-04 | Phase 3 | Complete |
-| TIME-01 | — | Pending |
-| TIME-02 | — | Pending |
-| TIME-03 | — | Pending |
-| TIME-04 | — | Pending |
-| TIME-05 | — | Pending |
-| TIME-06 | — | Pending |
-| TIME-07 | — | Pending |
-| TIME-08 | — | Pending |
-| TIME-09 | — | Pending |
-| TIME-10 | — | Pending |
-| COMM-01 | — | Pending |
-| COMM-02 | — | Pending |
-| COMP-06 | — | Pending |
-| COMP-07 | — | Pending |
-| COMP-08 | — | Pending |
-| GP-01 | — | Pending |
-| GP-02 | — | Pending |
-| GP-03 | — | Pending |
+| TIME-01 | Phase 4 | Pending |
+| TIME-02 | Phase 4 | Pending |
+| TIME-03 | Phase 5 | Pending |
+| TIME-04 | Phase 5 | Pending |
+| TIME-05 | Phase 5 | Pending |
+| TIME-06 | Phase 5 | Pending |
+| TIME-07 | Phase 5 | Pending |
+| TIME-08 | Phase 5 | Pending |
+| TIME-09 | Phase 5 | Pending |
+| TIME-10 | Phase 5 | Pending |
+| COMM-01 | Phase 5 | Pending |
+| COMM-02 | Phase 5 | Pending |
+| COMP-06 | Phase 6 | Pending |
+| COMP-07 | Phase 6 | Pending |
+| COMP-08 | Phase 6 | Pending |
+| GP-01 | Phase 4 | Pending |
+| GP-02 | Phase 4 | Pending |
+| GP-03 | Phase 4 | Pending |
 
 **Coverage:**
-- v1.0 requirements: 58 total — all complete
-- v1.2 requirements: 18 total — pending roadmap mapping
-- v1.3 requirements: 12 total — pending future milestone
-- Unmapped v1.2: 18
+- v1.0 requirements: 58 total -- all complete
+- v1.2 requirements: 18 total -- all mapped to Phases 4-6
+- v1.3 requirements: 12 total -- pending future milestone
+- Unmapped v1.2: 0
 
 ---
 *Requirements defined: 2026-02-14*
-*Last updated: 2026-02-18 after v1.2 milestone requirements defined*
+*Last updated: 2026-02-18 after v1.2 roadmap created*

@@ -2,17 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-16)
+See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** An employee can report sickness and be guided through a complete return-to-work cycle -- with their manager receiving structured, empathetic guidance at every step.
-**Current focus:** Milestone v1.2 — Absence Timeline Engine
+**Current focus:** Milestone v1.2 -- Absence Timeline Engine, Phase 4
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-18 — Milestone v1.2 started
+Phase: 4 of 6 (Timeline Engine & GP Details)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-02-18 -- Roadmap created for v1.2
+
+Progress: [████████████░░░░░░░░] 60% (13/~18 plans across all milestones)
 
 ## Performance Metrics
 
@@ -40,24 +42,11 @@ Recent decisions affecting current work:
 
 - Supabase Auth replaced Auth0 for authentication
 - Invite-only access model (no public sign up)
-- Waitlist form for prospect capture (database table)
-- Evolved purple brand identity for landing page
-- CSS-only bar charts for analytics (Tailwind divs) instead of charting library
-- PDF export via print-ready HTML with @media print styles
-- MINIMUM_COHORT_SIZE=5 for analytics privacy enforcement
-- Compliance-first build order: audit logging, encryption, and RBAC must exist before any health data flows
-- Trigger-based audit log immutability (instead of REVOKE) for Supabase superuser connections
 - RLS via session variables (app.current_organisation_id) set per-request
 - TenantService.withTenant() wraps all org-scoped queries with RLS context
-- Client-side file parsing (PapaParse for CSV, SheetJS for Excel) before sending to server
-- Two-pass fuzzy matching for column aliases: exact match first, then substring
-- Dual API path for employee import: JSON body (new wizard) and FormData (backward compat)
-- Bradford Factor uses simple weekday count (not WorkingDaysService) for ongoing cases
+- Trigger-based audit log immutability for Supabase superuser connections
+- Bradford Factor uses simple weekday count for ongoing cases
 - Alert deduplication by trigger_config_id + sickness_case_id pair
-- Trigger evaluation is fire-and-forget to avoid blocking case creation
-- Dialog-based forms for OH provider and referral CRUD (inline, not separate pages)
-- Report notes encrypted via EncryptionService on REPORT_RECEIVED transition
-- RLS on oh_referral_communications via EXISTS join through oh_referrals
 
 ### Pending Todos
 
@@ -67,15 +56,14 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
-| 1 | Smart column mapping UI for CSV/Excel import with fuzzy matching and confirmation screen | 2026-02-16 | 10138d5 | [1-smart-column-mapping-ui-for-csv-excel-im](./quick/1-smart-column-mapping-ui-for-csv-excel-im/) |
-| 2 | Landing page with hero, features, how-it-works, social proof, CTA, and waitlist form | 2026-02-16 | 5d42cba | [2-build-the-landing-page-homepage](./quick/2-build-the-landing-page-homepage/) |
+| 1 | Smart column mapping UI for CSV/Excel import | 2026-02-16 | 10138d5 | quick/1-smart-column-mapping-ui-for-csv-excel-im/ |
+| 2 | Landing page with hero, features, social proof, CTA | 2026-02-16 | 5d42cba | quick/2-build-the-landing-page-homepage/ |
 
 ### Blockers/Concerns
 
 - DATABASE_URL: Supabase project in .env (rbejmrydmkdybbvscwth) does not exist. User must provide valid DATABASE_URL and run migrations
-- Library versions from research need verification against npm before install (recharts, etc.) -- date-fns@4.1.0 installed
 
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Starting milestone v1.2 — defining requirements
+Stopped at: Roadmap created for v1.2 milestone -- ready to plan Phase 4
