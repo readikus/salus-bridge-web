@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 4 of 6 (Timeline Engine & GP Details)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-02-18 -- Roadmap created for v1.2
+Plan: 1 of 3 in current phase
+Status: Executing
+Last activity: 2026-02-19 -- Completed 04-01 schema foundation
 
-Progress: [████████████░░░░░░░░] 60% (13/~18 plans across all milestones)
+Progress: [█████████████░░░░░░░] 64% (14/~18 plans across all milestones)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 9min
+- Total plans completed: 16
+- Average duration: 8min
 - Total execution time: 2.0 hours
 
 **By Phase:**
@@ -30,6 +30,7 @@ Progress: [████████████░░░░░░░░] 60% (13
 | 01-foundation-and-access | 5/5 | 33min | 7min |
 | 02-sickness-lifecycle | 5/5 | 76min | 15min |
 | 03-monitoring-and-intelligence | 3/3 | 26min | 9min |
+| 04-timeline-engine-and-gp-details | 1/3 | 2min | 2min |
 
 *Updated after each plan completion*
 
@@ -47,6 +48,9 @@ Recent decisions affecting current work:
 - Trigger-based audit log immutability for Supabase superuser connections
 - Bradford Factor uses simple weekday count for ongoing cases
 - Alert deduplication by trigger_config_id + sickness_case_id pair
+- Nullable organisation_id pattern for system defaults vs org overrides in milestone_configs
+- Partial unique index for NULL-scoped uniqueness on milestone defaults
+- Single consent record per employee with upsert pattern
 
 ### Pending Todos
 
@@ -65,5 +69,5 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Roadmap created for v1.2 milestone -- ready to plan Phase 4
+Last session: 2026-02-19
+Stopped at: Completed 04-01-PLAN.md -- schema foundation for milestones and GP details
