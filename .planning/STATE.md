@@ -30,7 +30,7 @@ Progress: [████████████████░░░░] 80% (16
 | 01-foundation-and-access | 5/5 | 33min | 7min |
 | 02-sickness-lifecycle | 5/5 | 76min | 15min |
 | 03-monitoring-and-intelligence | 3/3 | 26min | 9min |
-| 04-timeline-engine-and-gp-details | 3/3 | 6min | 2min |
+| 04-timeline-engine-and-gp-details | 3/3 | 11min | 4min |
 
 *Updated after each plan completion*
 
@@ -50,6 +50,8 @@ Recent decisions affecting current work:
 - Alert deduplication by trigger_config_id + sickness_case_id pair
 - Nullable organisation_id pattern for system defaults vs org overrides in milestone_configs
 - Partial unique index for NULL-scoped uniqueness on milestone defaults
+- Fallback to hardcoded DEFAULT_MILESTONES when DB not seeded for milestone timeline
+- Upsert pattern for org milestone overrides keyed by milestoneKey
 - Single consent record per employee with upsert pattern
 - Ownership-based access control for GP details (employee.userId === sessionUser.id)
 - Employee ID resolved via fetchMyData on profile page
