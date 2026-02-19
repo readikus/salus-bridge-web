@@ -1,6 +1,7 @@
 import { SicknessCase, CaseTransition } from "@/types/database";
 import { CreateSicknessCaseInput } from "@/schemas/sickness-case";
 import { SicknessAction } from "@/constants/sickness-states";
+import { CaseTimelineEntry } from "@/providers/services/milestone.service";
 
 export interface SicknessCaseFilters {
   status?: string;
@@ -94,6 +95,18 @@ export async function fetchTransitionCase(
 }
 
 /**
+ * Fetch the milestone timeline for a sickness case.
+ */
+export async function fetchCaseTimeline(caseId: string): Promise<{ timeline: CaseTimelineEntry[] }> {
+  const res = await fetch(`/api/sickness-cases/${caseId}/timeline`);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to fetch case timeline");
+  }
+  return res.json();
+}
+
+/**
  * Fetch sickness cases for the absence calendar with date range filtering.
  */
 export async function fetchAbsenceCalendar(
@@ -123,7 +136,7 @@ export async function fetchAbsenceCalendar(
  */
 export async function fetchUpdateSicknessCase(
   id: string,
-  data: { absenceEndDate: string },
+  data: { absenceStartDate?: string; absenceEndDate?: string },
 ): Promise<SicknessCase> {
   const res = await fetch(`/api/sickness-cases/${id}`, {
     method: "PATCH",
