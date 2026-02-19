@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   FileText,
   BarChart3,
+  Timer,
   LucideIcon,
 } from "lucide-react";
 
@@ -94,6 +95,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/triggers",
     icon: AlertTriangle,
     roles: [UserRole.PLATFORM_ADMIN, UserRole.ORG_ADMIN, UserRole.HR, UserRole.MANAGER],
+  },
+  {
+    label: "Milestones",
+    href: "/milestones",
+    icon: Timer,
+    roles: [UserRole.PLATFORM_ADMIN, UserRole.ORG_ADMIN],
   },
   {
     label: "OH Providers",

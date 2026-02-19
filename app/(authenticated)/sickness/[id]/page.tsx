@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { SicknessCaseDetail } from "@/components/sickness-case-detail";
+import { CaseTimeline } from "@/components/case-timeline";
 import { fetchSicknessCase, SicknessCaseDetailResponse } from "@/actions/sickness-cases";
 
 export default function SicknessCaseDetailPage() {
@@ -53,6 +54,8 @@ export default function SicknessCaseDetailPage() {
 
   if (!data) return null;
 
+  const isActiveCaseForTimeline = data.sicknessCase.status !== "CLOSED";
+
   return (
     <div>
       <div className="mb-6">
@@ -72,6 +75,13 @@ export default function SicknessCaseDetailPage() {
         availableActions={data.availableActions}
         canManage={data.canManage}
       />
+
+      {isActiveCaseForTimeline && (
+        <div className="mt-8">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">Absence Timeline</h2>
+          <CaseTimeline caseId={params.id} />
+        </div>
+      )}
     </div>
   );
 }
