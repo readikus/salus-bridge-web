@@ -22,6 +22,8 @@ export enum AuditAction {
   ALERT = "ALERT",
   ACKNOWLEDGE = "ACKNOWLEDGE",
   REFER = "REFER",
+  CONSENT = "CONSENT",
+  REVOKE = "REVOKE",
 }
 
 export enum AuditEntity {
@@ -40,6 +42,9 @@ export enum AuditEntity {
   OH_PROVIDER = "OH_PROVIDER",
   OH_REFERRAL = "OH_REFERRAL",
   ANALYTICS = "ANALYTICS",
+  MILESTONE_CONFIG = "MILESTONE_CONFIG",
+  MEDICAL_CONSENT = "MEDICAL_CONSENT",
+  GP_DETAILS = "GP_DETAILS",
 }
 
 export enum OrganisationStatus {

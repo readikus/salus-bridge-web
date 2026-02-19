@@ -48,6 +48,9 @@ export interface Employee {
   status: EmployeeStatus;
   invitationToken: string | null;
   invitationExpiresAt: Date | null;
+  gpName: string | null;
+  gpAddress: string | null;
+  gpPhone: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -128,6 +131,8 @@ export interface SicknessCase {
   isLongTerm: boolean;
   createdAt: Date;
   updatedAt: Date;
+  employeeFirstName?: string;
+  employeeLastName?: string;
 }
 
 export interface CaseTransition {
@@ -274,6 +279,39 @@ export interface OhReferralCommunicationWithAuthor extends OhReferralCommunicati
   authorFirstName: string | null;
   authorLastName: string | null;
   authorEmail: string;
+}
+
+export interface MilestoneConfig {
+  id: string;
+  organisationId: string | null;
+  milestoneKey: string;
+  label: string;
+  dayOffset: number;
+  description: string | null;
+  isActive: boolean;
+  isDefault: boolean;
+  createdBy: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MedicalRecordsConsent {
+  id: string;
+  organisationId: string;
+  employeeId: string;
+  consentedBy: string;
+  consentStatus: string;
+  consentDate: Date | null;
+  revokedDate: Date | null;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MedicalRecordsConsentWithEmployee extends MedicalRecordsConsent {
+  employeeFirstName: string | null;
+  employeeLastName: string | null;
+  employeeEmail: string | null;
 }
 
 export interface AuditFilters extends PaginationOptions {
