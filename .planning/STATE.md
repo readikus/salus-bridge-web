@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 4 of 6 (Timeline Engine & GP Details)
-Plan: 1 of 3 in current phase
-Status: Executing
-Last activity: 2026-02-19 -- Completed 04-01 schema foundation
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: Phase Complete
+Last activity: 2026-02-19 -- Completed 04-03 GP details and medical consent
 
-Progress: [█████████████░░░░░░░] 64% (14/~18 plans across all milestones)
+Progress: [████████████████░░░░] 80% (16/~18 plans across all milestones)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 18
 - Average duration: 8min
-- Total execution time: 2.0 hours
+- Total execution time: 2.1 hours
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: [█████████████░░░░░░░] 64% (14
 | 01-foundation-and-access | 5/5 | 33min | 7min |
 | 02-sickness-lifecycle | 5/5 | 76min | 15min |
 | 03-monitoring-and-intelligence | 3/3 | 26min | 9min |
-| 04-timeline-engine-and-gp-details | 1/3 | 2min | 2min |
+| 04-timeline-engine-and-gp-details | 3/3 | 6min | 2min |
 
 *Updated after each plan completion*
 
@@ -51,6 +51,8 @@ Recent decisions affecting current work:
 - Nullable organisation_id pattern for system defaults vs org overrides in milestone_configs
 - Partial unique index for NULL-scoped uniqueness on milestone defaults
 - Single consent record per employee with upsert pattern
+- Ownership-based access control for GP details (employee.userId === sessionUser.id)
+- Employee ID resolved via fetchMyData on profile page
 
 ### Pending Todos
 
@@ -70,4 +72,4 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 04-01-PLAN.md -- schema foundation for milestones and GP details
+Stopped at: Completed 04-03-PLAN.md -- GP details and medical consent (phase 04 complete)
