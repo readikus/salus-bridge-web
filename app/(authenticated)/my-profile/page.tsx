@@ -1,10 +1,28 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { UserCircle, Building2, Shield } from "lucide-react";
+import { fetchMyData } from "@/actions/employees";
+import { GpDetailsForm } from "@/components/gp-details-form";
+import { ConsentForm } from "@/components/consent-form";
 
 export default function MyProfilePage() {
   const { user, isLoading, roles } = useAuth();
+  const [employeeId, setEmployeeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchMyData()
+      .then((data) => {
+        if (data?.personalInfo?.id) {
+          setEmployeeId(data.personalInfo.id);
+        }
+      })
+      .catch(() => {
+        // User may not have an employee record (e.g. platform admin)
+      });
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -115,6 +133,14 @@ export default function MyProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* GP Details and Medical Consent -- only shown for users with an employee record */}
+      {employeeId && (
+        <div className="mt-8 space-y-8">
+          <GpDetailsForm employeeId={employeeId} />
+          <ConsentForm employeeId={employeeId} />
+        </div>
+      )}
     </div>
   );
 }
