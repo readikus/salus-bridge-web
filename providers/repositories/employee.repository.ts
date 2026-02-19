@@ -550,4 +550,64 @@ export class EmployeeRepository {
       activityLog: auditResult.rows,
     };
   }
+
+  /**
+   * Get GP details for an employee.
+   */
+  static async getGpDetails(
+    employeeId: string,
+    client?: PoolClient,
+  ): Promise<{ gpName: string | null; gpAddress: string | null; gpPhone: string | null } | null> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const result = await queryFn(
+      `SELECT
+        gp_name AS "gpName",
+        gp_address AS "gpAddress",
+        gp_phone AS "gpPhone"
+      FROM employees
+      WHERE id = $1`,
+      [employeeId],
+    );
+
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Update GP details for an employee (partial update).
+   */
+  static async updateGpDetails(
+    employeeId: string,
+    data: { gpName?: string | null; gpAddress?: string | null; gpPhone?: string | null },
+    client?: PoolClient,
+  ): Promise<void> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const setClauses: string[] = [];
+    const values: (string | null | undefined)[] = [];
+    let paramIndex = 1;
+
+    if (data.gpName !== undefined) {
+      setClauses.push(`gp_name = $${paramIndex++}`);
+      values.push(data.gpName);
+    }
+    if (data.gpAddress !== undefined) {
+      setClauses.push(`gp_address = $${paramIndex++}`);
+      values.push(data.gpAddress);
+    }
+    if (data.gpPhone !== undefined) {
+      setClauses.push(`gp_phone = $${paramIndex++}`);
+      values.push(data.gpPhone);
+    }
+
+    if (setClauses.length === 0) return;
+
+    setClauses.push("updated_at = NOW()");
+    values.push(employeeId);
+
+    await queryFn(
+      `UPDATE employees
+      SET ${setClauses.join(", ")}
+      WHERE id = $${paramIndex}`,
+      values,
+    );
+  }
 }
