@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** An employee can report sickness and be guided through a complete return-to-work cycle -- with their manager receiving structured, empathetic guidance at every step.
-**Current focus:** Milestone v1.2 -- Absence Timeline Engine, Phase 4
+**Current focus:** Milestone v1.2 -- Absence Timeline Engine, Phase 5
 
 ## Current Position
 
-Phase: 4 of 6 (Timeline Engine & GP Details)
-Plan: 3 of 3 in current phase (COMPLETE)
-Status: Phase Complete
-Last activity: 2026-02-19 -- Completed 04-03 GP details and medical consent
+Phase: 5 of 6 (Milestone Actions & Communication Log)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-02-19 -- Phase 4 verified and complete
 
-Progress: [████████████████░░░░] 80% (16/~18 plans across all milestones)
+Progress: [████████████████░░░░] 80% (18/~21 plans across all milestones)
 
 ## Performance Metrics
 
@@ -74,4 +74,4 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 04-03-PLAN.md -- GP details and medical consent (phase 04 complete)
+Stopped at: Phase 4 executed and verified -- ready to plan Phase 5
