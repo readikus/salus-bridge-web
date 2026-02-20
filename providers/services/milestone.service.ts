@@ -1,8 +1,10 @@
 import { MilestoneConfigRepository } from "@/providers/repositories/milestone-config.repository";
+import { MilestoneGuidanceRepository } from "@/providers/repositories/milestone-guidance.repository";
 import { SicknessCaseRepository } from "@/providers/repositories/sickness-case.repository";
-import { MilestoneConfig } from "@/types/database";
+import { MilestoneConfig, MilestoneGuidanceRecord, MilestoneGuidanceContent } from "@/types/database";
 import { CreateMilestoneConfigInput } from "@/schemas/milestone-config";
 import { DEFAULT_MILESTONES } from "@/constants/milestone-defaults";
+import { MILESTONE_GUIDANCE } from "@/constants/milestone-guidance";
 import { PoolClient } from "pg";
 
 /**
@@ -182,5 +184,64 @@ export class MilestoneService {
     }
 
     await MilestoneConfigRepository.delete(configId, client);
+  }
+
+  /**
+   * Get guidance for a single milestone.
+   * DB-first with hardcoded MILESTONE_GUIDANCE fallback.
+   */
+  static async getGuidanceForMilestone(
+    milestoneKey: string,
+    organisationId?: string,
+    client?: PoolClient,
+  ): Promise<MilestoneGuidanceContent | null> {
+    const dbGuidance = await MilestoneGuidanceRepository.findByMilestoneKey(milestoneKey, organisationId, client);
+
+    if (dbGuidance) {
+      return dbGuidance;
+    }
+
+    // Fallback to hardcoded constant
+    const hardcoded = MILESTONE_GUIDANCE[milestoneKey];
+    return hardcoded || null;
+  }
+
+  /**
+   * Get guidance for multiple milestones in one call.
+   * Fetches all defaults from DB, overlays org overrides if orgId provided,
+   * falls back to hardcoded constant for any missing keys.
+   */
+  static async getGuidanceMap(
+    milestoneKeys: string[],
+    organisationId?: string,
+    client?: PoolClient,
+  ): Promise<Record<string, MilestoneGuidanceContent>> {
+    const map: Record<string, MilestoneGuidanceContent> = {};
+
+    // Fetch DB defaults
+    const defaults = await MilestoneGuidanceRepository.findDefaults(client);
+    for (const d of defaults) {
+      map[d.milestoneKey] = d;
+    }
+
+    // Overlay org overrides if provided
+    if (organisationId) {
+      const overrides = await MilestoneGuidanceRepository.findByOrganisation(organisationId, client);
+      for (const o of overrides) {
+        map[o.milestoneKey] = o;
+      }
+    }
+
+    // Fill in any missing keys from hardcoded constant
+    for (const key of milestoneKeys) {
+      if (!map[key]) {
+        const hardcoded = MILESTONE_GUIDANCE[key];
+        if (hardcoded) {
+          map[key] = hardcoded;
+        }
+      }
+    }
+
+    return map;
   }
 }

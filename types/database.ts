@@ -352,6 +352,31 @@ export interface CommunicationLogEntryWithAuthor extends CommunicationLogEntry {
   authorEmail: string;
 }
 
+export interface MilestoneGuidanceRecord {
+  id: string;
+  organisationId: string | null;
+  milestoneKey: string;
+  actionTitle: string;
+  managerGuidance: string;
+  suggestedText: string;
+  instructions: string[];
+  employeeView: string;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Content-only fields from milestone guidance, used by UI components.
+ */
+export interface MilestoneGuidanceContent {
+  actionTitle: string;
+  managerGuidance: string;
+  suggestedText: string;
+  instructions: string[];
+  employeeView: string;
+}
+
 export interface AuditFilters extends PaginationOptions {
   entity?: string;
   action?: string;
