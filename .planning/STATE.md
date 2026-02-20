@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 Phase: 5 of 6 (Milestone Actions & Communication Log)
 Plan: 1 of 3 in current phase
 Status: Executing
-Last activity: 2026-02-20 -- Completed quick task 5: Build the triggers and milestones pages
+Last activity: 2026-02-20 -- Completed quick task 4: Surface outstanding milestone actions on dashboard
 
 Progress: [█████████████████░░░] 86% (19/~22 plans across all milestones)
 
@@ -70,6 +70,7 @@ None yet.
 | 1 | Smart column mapping UI for CSV/Excel import | 2026-02-16 | 10138d5 | quick/1-smart-column-mapping-ui-for-csv-excel-im/ |
 | 2 | Landing page with hero, features, social proof, CTA | 2026-02-16 | 5d42cba | quick/2-build-the-landing-page-homepage/ |
 | 3 | Milestone action cards with empathetic guidance text | 2026-02-20 | a73056c | quick/3-milestone-action-cards-with-guidance-tex/ |
+| 4 | Surface outstanding milestone actions on dashboard | 2026-02-20 | c483332 | quick/4-surface-outstanding-milestone-actions-on/ |
 | 5 | Build the triggers and milestones pages | 2026-02-20 | 3106a43 | quick/5-build-the-triggers-and-milestone-pages/ |
 
 ### Blockers/Concerns
@@ -79,4 +80,4 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed quick-5 (Build the Triggers and Milestones Pages)
+Stopped at: Completed quick-4 (Surface Outstanding Milestone Actions on Dashboard)
