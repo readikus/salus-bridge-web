@@ -1,4 +1,4 @@
-import { MilestoneAction } from "@/types/database";
+import { MilestoneAction, MilestoneGuidanceContent } from "@/types/database";
 
 /**
  * Fetch milestone actions for a sickness case.
@@ -18,7 +18,7 @@ export async function fetchMilestoneActions(caseId: string): Promise<{ actions: 
  */
 export async function fetchUpdateMilestoneAction(
   actionId: string,
-  data: { status: "IN_PROGRESS" | "COMPLETED"; notes?: string; completedAt?: string },
+  data: { status: "PENDING" | "IN_PROGRESS" | "COMPLETED"; notes?: string; completedAt?: string },
 ): Promise<{ action: MilestoneAction }> {
   const res = await fetch(`/api/milestone-actions/${actionId}`, {
     method: "PATCH",
@@ -28,6 +28,21 @@ export async function fetchUpdateMilestoneAction(
   if (!res.ok) {
     const responseData = await res.json().catch(() => ({}));
     throw new Error(responseData.error || "Failed to update milestone action");
+  }
+  return res.json();
+}
+
+/**
+ * Fetch milestone guidance map for a sickness case.
+ * Returns guidance content keyed by milestone key.
+ */
+export async function fetchMilestoneGuidance(
+  caseId: string,
+): Promise<{ guidance: Record<string, MilestoneGuidanceContent> }> {
+  const res = await fetch(`/api/sickness-cases/${caseId}/milestone-guidance`);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to fetch milestone guidance");
   }
   return res.json();
 }

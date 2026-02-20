@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { fetchCaseTimeline, fetchTransitionCase } from "@/actions/sickness-cases";
-import { fetchMilestoneActions, fetchUpdateMilestoneAction } from "@/actions/milestone-actions";
+import { fetchMilestoneActions, fetchUpdateMilestoneAction, fetchMilestoneGuidance } from "@/actions/milestone-actions";
 import { CaseTimelineEntry } from "@/providers/services/milestone.service";
-import { MilestoneAction, SicknessCase } from "@/types/database";
-import { MILESTONE_GUIDANCE, MilestoneGuidance } from "@/constants/milestone-guidance";
+import { MilestoneAction, MilestoneGuidanceContent, SicknessCase } from "@/types/database";
 import { MILESTONE_TRANSITIONS } from "@/constants/milestone-transitions";
 import { SicknessAction, VALID_TRANSITIONS, SicknessState } from "@/constants/sickness-states";
 import {
@@ -18,6 +17,7 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Undo2,
   Save,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -66,7 +66,7 @@ function isTransitionAvailable(caseStatus: string, action: SicknessAction): bool
 interface MilestoneCardProps {
   entry: CaseTimelineEntry;
   action?: MilestoneAction;
-  guidance?: MilestoneGuidance;
+  guidance?: MilestoneGuidanceContent;
   employeeName?: string;
   showEmployeeView: boolean;
   canManage: boolean;
@@ -172,6 +172,20 @@ function MilestoneCard({
     }
   };
 
+  const handleUndo = async () => {
+    if (!action) return;
+    try {
+      setIsSaving(true);
+      setSaveError(null);
+      await fetchUpdateMilestoneAction(action.id, { status: "PENDING" });
+      onActionUpdated();
+    } catch (err: any) {
+      setSaveError(err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className={`rounded-lg border border-gray-200 border-l-4 ${accentClass} bg-white`}>
       {/* Header — always visible */}
@@ -204,13 +218,28 @@ function MilestoneCard({
         </div>
       </button>
 
-      {/* Completed notes — always visible without expanding */}
-      {isCompleted && action?.notes && (
-        <div className="border-t border-gray-100 px-5 py-3">
-          <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
-            <p className="text-xs font-medium text-gray-500 mb-1">Notes</p>
-            {action.notes}
-          </div>
+      {/* Completed summary — always visible without expanding */}
+      {isCompleted && canManage && (
+        <div className="border-t border-gray-100 px-5 py-3 space-y-2">
+          {action?.notes && (
+            <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
+              <p className="text-xs font-medium text-gray-500 mb-1">Notes</p>
+              {action.notes}
+            </div>
+          )}
+          {saveError && (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              {saveError}
+            </div>
+          )}
+          <button
+            onClick={handleUndo}
+            disabled={isSaving}
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Undo2 className="h-3.5 w-3.5" />}
+            Undo
+          </button>
         </div>
       )}
 
@@ -327,6 +356,7 @@ function MilestoneCard({
 export function CaseTimeline({ caseId, sicknessCase, canManage, onCaseTransition }: Props) {
   const [timeline, setTimeline] = useState<CaseTimelineEntry[]>([]);
   const [actions, setActions] = useState<MilestoneAction[]>([]);
+  const [guidanceMap, setGuidanceMap] = useState<Record<string, MilestoneGuidanceContent>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState<string | null>(null);
   const [showEmployeeView, setShowEmployeeView] = useState(false);
@@ -337,12 +367,14 @@ export function CaseTimeline({ caseId, sicknessCase, canManage, onCaseTransition
   const loadData = useCallback(async () => {
     try {
       setHasError(null);
-      const [timelineRes, actionsRes] = await Promise.all([
+      const [timelineRes, actionsRes, guidanceRes] = await Promise.all([
         fetchCaseTimeline(caseId),
         fetchMilestoneActions(caseId),
+        fetchMilestoneGuidance(caseId),
       ]);
       setTimeline(timelineRes.timeline);
       setActions(actionsRes.actions);
+      setGuidanceMap(guidanceRes.guidance);
     } catch (err: any) {
       setHasError(err.message);
     } finally {
@@ -406,7 +438,7 @@ export function CaseTimeline({ caseId, sicknessCase, canManage, onCaseTransition
             key={entry.milestone.milestoneKey}
             entry={entry}
             action={actionMap.get(entry.milestone.milestoneKey)}
-            guidance={MILESTONE_GUIDANCE[entry.milestone.milestoneKey]}
+            guidance={guidanceMap[entry.milestone.milestoneKey]}
             employeeName={employeeName}
             showEmployeeView={showEmployeeView}
             canManage={canManage}
