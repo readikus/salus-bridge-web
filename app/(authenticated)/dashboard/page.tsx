@@ -4,7 +4,11 @@ import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { OrganisationService } from "@/providers/services/organisation.service";
 import { SicknessCaseService } from "@/providers/services/sickness-case.service";
 import { EmployeeRepository } from "@/providers/repositories/employee.repository";
+import { MilestoneActionRepository } from "@/providers/repositories/milestone-action.repository";
+import { TenantService } from "@/providers/services/tenant.service";
+import { MilestoneActionWithDetails } from "@/types/database";
 import { UserRole } from "@/types/enums";
+import { OutstandingActions } from "@/components/outstanding-actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, UserCircle, FileText, Heart, Calendar } from "lucide-react";
 
@@ -40,6 +44,16 @@ export default async function DashboardPage() {
       activeAbsenceCount = allCases.filter((c) => ACTIVE_STATUSES.includes(c.status)).length;
     } catch {
       // Silently handle -- dashboard should still render
+    }
+
+    // Get outstanding milestone actions
+    let outstandingActions: (MilestoneActionWithDetails & { caseId: string })[] = [];
+    try {
+      outstandingActions = await TenantService.withTenant(organisationId, false, async (client) => {
+        return MilestoneActionRepository.findOutstandingWithDetails(organisationId, client);
+      });
+    } catch {
+      // Silently handle
     }
 
     return (
@@ -104,6 +118,20 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
+        {outstandingActions.length > 0 && (
+          <div className="col-span-full">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Outstanding Actions</CardTitle>
+                <FileText className="h-4 w-4 text-gray-500" />
+              </CardHeader>
+              <CardContent>
+                <OutstandingActions actions={outstandingActions} />
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Department breakdown */}
         {stats.departments.length > 0 && (
           <div className="mt-8">
@@ -145,6 +173,18 @@ export default async function DashboardPage() {
       // Silently handle
     }
 
+    // Get outstanding milestone actions
+    let managerOutstandingActions: (MilestoneActionWithDetails & { caseId: string })[] = [];
+    try {
+      managerOutstandingActions = await TenantService.withTenant(organisationId, false, async (client) => {
+        return MilestoneActionRepository.findOutstandingWithDetails(organisationId, client);
+      });
+    } catch {
+      // Silently handle
+    }
+
+    const overdueCount = managerOutstandingActions.filter((a) => new Date(a.dueDate) < new Date()).length;
+
     return (
       <div>
         <div className="mb-6">
@@ -183,8 +223,13 @@ export default async function DashboardPage() {
               <FileText className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-gray-500">No actions required</p>
+              <div className="text-2xl font-bold">{managerOutstandingActions.length}</div>
+              <p className="text-xs text-gray-500">
+                {managerOutstandingActions.length === 0 ? "No actions required" : `${overdueCount} overdue`}
+              </p>
+            </CardContent>
+            <CardContent className="pt-0">
+              <OutstandingActions actions={managerOutstandingActions} />
             </CardContent>
           </Card>
         </div>
