@@ -54,11 +54,11 @@ export class AuthService {
    * Get the current session user by Supabase Auth ID.
    * Used by /api/auth/me to hydrate client-side state.
    */
-  static async getSessionUser(supabaseAuthId: string): Promise<SessionUser | null> {
+  static async getSessionUser(supabaseAuthId: string, preferredOrgId?: string | null): Promise<SessionUser | null> {
     const user = await UserRepository.findBySupabaseAuthId(supabaseAuthId);
     if (!user) return null;
 
-    return UserService.getUserWithRoles(user.id);
+    return UserService.getUserWithRoles(user.id, preferredOrgId);
   }
 
   /**

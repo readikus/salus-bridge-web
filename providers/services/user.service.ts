@@ -67,14 +67,21 @@ export class UserService {
   /**
    * Get a user with all their roles for session context.
    */
-  static async getUserWithRoles(userId: string): Promise<SessionUser | null> {
+  static async getUserWithRoles(userId: string, preferredOrgId?: string | null): Promise<SessionUser | null> {
     const user = await UserRepository.findById(userId);
     if (!user) return null;
 
     const roles = await UserRoleRepository.findByUserId(userId);
 
-    // Determine current organisation: first org from roles, or null for platform-level
-    const currentOrganisationId = roles.length > 0 ? roles[0].organisationId : null;
+    // Determine current organisation:
+    // 1. Use preferred org if valid (user has a role in it)
+    // 2. Fall back to first org from roles
+    // 3. null for platform-level (no org roles)
+    let currentOrganisationId: string | null = null;
+    if (roles.length > 0) {
+      const hasPreferred = preferredOrgId && roles.some((r) => r.organisationId === preferredOrgId);
+      currentOrganisationId = hasPreferred ? preferredOrgId! : roles[0].organisationId;
+    }
 
     return {
       id: user.id,

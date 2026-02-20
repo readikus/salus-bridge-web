@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { AuthService } from "@/providers/services/auth.service";
 import { MilestoneConfigRepository } from "@/providers/repositories/milestone-config.repository";
 import { MilestoneService } from "@/providers/services/milestone.service";
+import { MilestoneGuidanceInput } from "@/schemas/milestone-config";
 import { TenantService } from "@/providers/services/tenant.service";
 import { AuditLogService } from "@/providers/services/audit-log.service";
 import { updateMilestoneConfigSchema } from "@/schemas/milestone-config";
@@ -42,8 +43,21 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const data = parseResult.data;
 
+    const { guidance, ...configData } = data;
+
     const config = await TenantService.withTenant(organisationId, false, async (client) => {
-      return MilestoneConfigRepository.update(id, data, client);
+      const updatedConfig = await MilestoneConfigRepository.update(id, configData, client);
+
+      if (guidance) {
+        await MilestoneService.upsertOrgGuidance(
+          organisationId,
+          updatedConfig.milestoneKey,
+          guidance as MilestoneGuidanceInput,
+          client,
+        );
+      }
+
+      return updatedConfig;
     });
 
     await AuditLogService.log({

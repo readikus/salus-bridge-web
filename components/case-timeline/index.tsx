@@ -178,6 +178,7 @@ function MilestoneCard({
       setIsSaving(true);
       setSaveError(null);
       await fetchUpdateMilestoneAction(action.id, { status: "PENDING" });
+      setIsExpanded(true);
       onActionUpdated();
     } catch (err: any) {
       setSaveError(err.message);
@@ -199,7 +200,7 @@ function MilestoneCard({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-900">
-                {guidance?.actionTitle || entry.milestone.label}
+                {entry.milestone.label}
               </span>
               {badgeNode}
             </div>

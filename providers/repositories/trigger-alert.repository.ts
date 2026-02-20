@@ -26,6 +26,18 @@ export class TriggerAlertRepository {
     ta.created_at AS "createdAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    trigger_config_id AS "triggerConfigId",
+    employee_id AS "employeeId",
+    sickness_case_id AS "sicknessCaseId",
+    triggered_value AS "triggeredValue",
+    acknowledged_by AS "acknowledgedBy",
+    acknowledged_at AS "acknowledgedAt",
+    created_at AS "createdAt"
+  `;
+
   private static readonly SELECT_WITH_DETAILS = `
     ta.id,
     ta.organisation_id AS "organisationId",
@@ -117,7 +129,7 @@ export class TriggerAlertRepository {
     const result = await queryFn(
       `INSERT INTO trigger_alerts (organisation_id, trigger_config_id, employee_id, sickness_case_id, triggered_value)
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING ${TriggerAlertRepository.SELECT_COLUMNS}`,
+      RETURNING ${TriggerAlertRepository.RETURNING_COLUMNS}`,
       [data.organisationId, data.triggerConfigId, data.employeeId, data.sicknessCaseId ?? null, data.triggeredValue],
     );
 
@@ -130,10 +142,10 @@ export class TriggerAlertRepository {
   static async acknowledge(id: string, userId: string, client?: PoolClient): Promise<TriggerAlert> {
     const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
     const result = await queryFn(
-      `UPDATE trigger_alerts ta
+      `UPDATE trigger_alerts
       SET acknowledged_by = $2, acknowledged_at = NOW()
-      WHERE ta.id = $1
-      RETURNING ${TriggerAlertRepository.SELECT_COLUMNS}`,
+      WHERE id = $1
+      RETURNING ${TriggerAlertRepository.RETURNING_COLUMNS}`,
       [id, userId],
     );
 

@@ -180,15 +180,37 @@ export class MilestoneActionRepository {
     const isCompleting = status === "COMPLETED";
 
     const result = await queryFn(
-      `UPDATE milestone_actions ma
+      `UPDATE milestone_actions
       SET status = $1,
           completed_by = ${isCompleting ? "$3" : "completed_by"},
           completed_at = ${isCompleting ? "COALESCE($5::timestamptz, now())" : "completed_at"},
           notes = COALESCE($4, notes),
           updated_at = now()
-      WHERE ma.id = $2
-      RETURNING ${MilestoneActionRepository.SELECT_COLUMNS}`,
+      WHERE id = $2
+      RETURNING ${MilestoneActionRepository.RETURNING_COLUMNS}`,
       [status, id, completedBy ?? null, notes ?? null, completedAt ?? null],
+    );
+
+    return result.rows[0];
+  }
+
+  /**
+   * Reset a completed milestone action back to PENDING.
+   * Clears completed_by, completed_at, and notes.
+   */
+  static async resetToPending(id: string, client?: PoolClient): Promise<MilestoneAction> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+
+    const result = await queryFn(
+      `UPDATE milestone_actions
+      SET status = 'PENDING',
+          completed_by = NULL,
+          completed_at = NULL,
+          notes = NULL,
+          updated_at = now()
+      WHERE id = $1
+      RETURNING ${MilestoneActionRepository.RETURNING_COLUMNS}`,
+      [id],
     );
 
     return result.rows[0];
@@ -233,8 +255,8 @@ export class MilestoneActionRepository {
       LEFT JOIN employees e ON e.id = sc.employee_id
       LEFT JOIN users u ON u.id = e.user_id
       WHERE ma.organisation_id = $1 AND ma.status IN ('PENDING', 'IN_PROGRESS')
-      ORDER BY ma.due_date ASC
-      LIMIT 20`,
+        AND ma.due_date <= CURRENT_DATE
+      ORDER BY ma.due_date ASC`,
       [organisationId],
     );
 

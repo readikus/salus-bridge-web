@@ -1,8 +1,13 @@
 import { MilestoneConfigRepository } from "@/providers/repositories/milestone-config.repository";
 import { MilestoneGuidanceRepository } from "@/providers/repositories/milestone-guidance.repository";
 import { SicknessCaseRepository } from "@/providers/repositories/sickness-case.repository";
-import { MilestoneConfig, MilestoneGuidanceRecord, MilestoneGuidanceContent } from "@/types/database";
-import { CreateMilestoneConfigInput } from "@/schemas/milestone-config";
+import {
+  MilestoneConfig,
+  MilestoneGuidanceRecord,
+  MilestoneGuidanceContent,
+  MilestoneConfigWithGuidance,
+} from "@/types/database";
+import { CreateMilestoneConfigInput, MilestoneGuidanceInput } from "@/schemas/milestone-config";
 import { DEFAULT_MILESTONES } from "@/constants/milestone-defaults";
 import { MILESTONE_GUIDANCE } from "@/constants/milestone-guidance";
 import { PoolClient } from "pg";
@@ -74,6 +79,94 @@ export class MilestoneService {
   }
 
   /**
+   * Get effective milestones with guidance content for the editor UI.
+   * Returns all milestones (active and inactive) with guidance attached.
+   */
+  static async getEffectiveMilestonesWithGuidance(
+    organisationId: string,
+    client?: PoolClient,
+  ): Promise<MilestoneConfigWithGuidance[]> {
+    const [defaults, overrides] = await Promise.all([
+      MilestoneConfigRepository.findDefaults(client),
+      MilestoneConfigRepository.findByOrganisation(organisationId, client),
+    ]);
+
+    // Build milestone map (same as getEffectiveMilestones but without active filter)
+    const milestoneMap = new Map<string, MilestoneConfig>();
+
+    if (defaults.length > 0) {
+      for (const d of defaults) {
+        milestoneMap.set(d.milestoneKey, d);
+      }
+    } else {
+      for (const d of DEFAULT_MILESTONES) {
+        milestoneMap.set(d.key, {
+          id: `default-${d.key}`,
+          organisationId: null,
+          milestoneKey: d.key,
+          label: d.label,
+          dayOffset: d.dayOffset,
+          description: d.description,
+          isActive: true,
+          isDefault: true,
+          createdBy: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+    }
+
+    for (const o of overrides) {
+      milestoneMap.set(o.milestoneKey, o);
+    }
+
+    const milestones = Array.from(milestoneMap.values()).sort((a, b) => a.dayOffset - b.dayOffset);
+    const milestoneKeys = milestones.map((m) => m.milestoneKey);
+
+    // Build guidance map
+    const guidanceMap = await MilestoneService.getGuidanceMap(milestoneKeys, organisationId, client);
+
+    // Check which keys have org-level guidance overrides
+    const orgGuidanceOverrides = await MilestoneGuidanceRepository.findByOrganisation(organisationId, client);
+    const orgGuidanceKeys = new Set(orgGuidanceOverrides.map((g) => g.milestoneKey));
+
+    return milestones.map((m) => ({
+      ...m,
+      guidance: guidanceMap[m.milestoneKey] || null,
+      guidanceIsDefault: !orgGuidanceKeys.has(m.milestoneKey),
+    }));
+  }
+
+  /**
+   * Create or update org-level guidance override for a milestone key.
+   */
+  static async upsertOrgGuidance(
+    organisationId: string,
+    milestoneKey: string,
+    data: MilestoneGuidanceInput,
+    client?: PoolClient,
+  ): Promise<MilestoneGuidanceRecord> {
+    const existing = await MilestoneGuidanceRepository.findByOrgAndKey(organisationId, milestoneKey, client);
+
+    if (existing) {
+      return MilestoneGuidanceRepository.update(existing.id, data, client);
+    }
+
+    return MilestoneGuidanceRepository.create(
+      {
+        organisationId,
+        milestoneKey,
+        actionTitle: data.actionTitle,
+        managerGuidance: data.managerGuidance,
+        suggestedText: data.suggestedText,
+        instructions: data.instructions,
+        employeeView: data.employeeView,
+      },
+      client,
+    );
+  }
+
+  /**
    * Get the timeline for a specific sickness case.
    * Computes the status of each milestone based on:
    * - absenceStartDate + dayOffset = milestone due date
@@ -134,8 +227,10 @@ export class MilestoneService {
   ): Promise<MilestoneConfig> {
     const existing = await MilestoneConfigRepository.findByOrgAndKey(organisationId, data.milestoneKey, client);
 
+    let config: MilestoneConfig;
+
     if (existing) {
-      return MilestoneConfigRepository.update(
+      config = await MilestoneConfigRepository.update(
         existing.id,
         {
           label: data.label,
@@ -145,20 +240,26 @@ export class MilestoneService {
         },
         client,
       );
+    } else {
+      config = await MilestoneConfigRepository.create(
+        {
+          organisationId,
+          milestoneKey: data.milestoneKey,
+          label: data.label,
+          dayOffset: data.dayOffset,
+          description: data.description ?? null,
+          isActive: data.isActive,
+          createdBy: userId,
+        },
+        client,
+      );
     }
 
-    return MilestoneConfigRepository.create(
-      {
-        organisationId,
-        milestoneKey: data.milestoneKey,
-        label: data.label,
-        dayOffset: data.dayOffset,
-        description: data.description ?? null,
-        isActive: data.isActive,
-        createdBy: userId,
-      },
-      client,
-    );
+    if (data.guidance) {
+      await MilestoneService.upsertOrgGuidance(organisationId, data.milestoneKey, data.guidance, client);
+    }
+
+    return config;
   }
 
   /**
@@ -183,6 +284,7 @@ export class MilestoneService {
       throw new Error("Cannot delete a system default milestone config");
     }
 
+    await MilestoneGuidanceRepository.deleteByOrgAndKey(organisationId, config.milestoneKey, client);
     await MilestoneConfigRepository.delete(configId, client);
   }
 

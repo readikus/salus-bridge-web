@@ -295,6 +295,11 @@ export interface MilestoneConfig {
   updatedAt: Date;
 }
 
+export interface MilestoneConfigWithGuidance extends MilestoneConfig {
+  guidance: MilestoneGuidanceContent | null;
+  guidanceIsDefault: boolean;
+}
+
 export interface MedicalRecordsConsent {
   id: string;
   organisationId: string;

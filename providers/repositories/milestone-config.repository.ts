@@ -21,6 +21,20 @@ export class MilestoneConfigRepository {
     mc.updated_at AS "updatedAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    milestone_key AS "milestoneKey",
+    label,
+    day_offset AS "dayOffset",
+    description,
+    is_active AS "isActive",
+    is_default AS "isDefault",
+    created_by AS "createdBy",
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   /**
    * Find all system default milestone configs.
    */
@@ -86,7 +100,7 @@ export class MilestoneConfigRepository {
     const result = await queryFn(
       `INSERT INTO milestone_configs (organisation_id, milestone_key, label, day_offset, description, is_active, is_default, created_by)
       VALUES ($1, $2, $3, $4, $5, $6, false, $7)
-      RETURNING ${MilestoneConfigRepository.SELECT_COLUMNS}`,
+      RETURNING ${MilestoneConfigRepository.RETURNING_COLUMNS}`,
       [
         data.organisationId,
         data.milestoneKey,
@@ -140,10 +154,10 @@ export class MilestoneConfigRepository {
     values.push(id);
 
     const result = await queryFn(
-      `UPDATE milestone_configs mc
+      `UPDATE milestone_configs
       SET ${setClauses.join(", ")}
-      WHERE mc.id = $${paramIndex}
-      RETURNING ${MilestoneConfigRepository.SELECT_COLUMNS}`,
+      WHERE id = $${paramIndex}
+      RETURNING ${MilestoneConfigRepository.RETURNING_COLUMNS}`,
       values,
     );
 

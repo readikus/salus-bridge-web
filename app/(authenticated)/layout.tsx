@@ -16,15 +16,24 @@ export default async function AuthenticatedLayout({
   }
 
   const roles = sessionUser.roles.map((r) => r.role as UserRole);
-  const organisationName = sessionUser.roles.length > 0 ? sessionUser.roles[0].organisationName : null;
   const displayName = [sessionUser.firstName, sessionUser.lastName].filter(Boolean).join(" ") || null;
+
+  // Build deduplicated org list from roles
+  const orgMap = new Map<string, string>();
+  for (const r of sessionUser.roles) {
+    if (!orgMap.has(r.organisationId)) {
+      orgMap.set(r.organisationId, r.organisationName);
+    }
+  }
+  const organisations = Array.from(orgMap, ([id, name]) => ({ id, name }));
 
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar
         userEmail={sessionUser.email}
         userName={displayName}
-        organisationName={organisationName}
+        currentOrganisationId={sessionUser.currentOrganisationId}
+        organisations={organisations}
         roles={roles}
         isSuperAdmin={sessionUser.isSuperAdmin}
       />

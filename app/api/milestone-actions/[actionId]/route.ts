@@ -28,21 +28,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = await request.json();
     const { status, notes, completedAt } = body;
 
-    if (!status || !["IN_PROGRESS", "COMPLETED"].includes(status)) {
-      return NextResponse.json({ error: "Invalid status. Must be IN_PROGRESS or COMPLETED." }, { status: 400 });
+    if (!status || !["PENDING", "IN_PROGRESS", "COMPLETED"].includes(status)) {
+      return NextResponse.json({ error: "Invalid status. Must be PENDING, IN_PROGRESS or COMPLETED." }, { status: 400 });
     }
 
     if (completedAt && !/^\d{4}-\d{2}-\d{2}$/.test(completedAt)) {
       return NextResponse.json({ error: "Invalid completedAt format. Use YYYY-MM-DD." }, { status: 400 });
     }
 
-    const updated = await MilestoneActionRepository.updateStatus(
-      actionId,
-      status,
-      sessionUser.id,
-      notes,
-      completedAt,
-    );
+    // Reset to PENDING clears completion fields
+    const updated =
+      status === "PENDING"
+        ? await MilestoneActionRepository.resetToPending(actionId)
+        : await MilestoneActionRepository.updateStatus(actionId, status, sessionUser.id, notes, completedAt);
 
     return NextResponse.json({ action: updated });
   } catch (error) {

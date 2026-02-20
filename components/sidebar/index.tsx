@@ -6,16 +6,23 @@ import { LogOut, Shield } from "lucide-react";
 import { UserRole } from "@/types/enums";
 import { createBrowserClient } from "@/providers/supabase/browser-client";
 import { getNavItemsForRoles } from "./nav-items";
+import { OrgSwitcher } from "./org-switcher";
+
+interface Organisation {
+  id: string;
+  name: string;
+}
 
 interface Props {
   userEmail: string;
   userName: string | null;
-  organisationName: string | null;
+  currentOrganisationId: string | null;
+  organisations: Organisation[];
   roles: UserRole[];
   isSuperAdmin: boolean;
 }
 
-export function Sidebar({ userEmail, userName, organisationName, roles, isSuperAdmin }: Props) {
+export function Sidebar({ userEmail, userName, currentOrganisationId, organisations, roles, isSuperAdmin }: Props) {
   const pathname = usePathname();
 
   const navItems = getNavItemsForRoles(roles, isSuperAdmin);
@@ -27,8 +34,8 @@ export function Sidebar({ userEmail, userName, organisationName, roles, isSuperA
         <Shield className="h-6 w-6 text-blue-600" />
         <div className="min-w-0">
           <h1 className="text-lg font-semibold text-gray-900">SalusBridge</h1>
-          {organisationName && (
-            <p className="truncate text-xs text-gray-500">{organisationName}</p>
+          {currentOrganisationId && organisations.length > 0 && (
+            <OrgSwitcher currentOrganisationId={currentOrganisationId} organisations={organisations} />
           )}
         </div>
       </div>

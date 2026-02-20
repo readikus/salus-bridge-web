@@ -29,7 +29,7 @@ export async function GET(_request: NextRequest) {
     }
 
     const milestones = await TenantService.withTenant(organisationId, false, async (client) => {
-      return MilestoneService.getEffectiveMilestones(organisationId, client);
+      return MilestoneService.getEffectiveMilestonesWithGuidance(organisationId, client);
     });
 
     return NextResponse.json({ milestones });

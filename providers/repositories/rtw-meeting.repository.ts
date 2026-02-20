@@ -23,6 +23,22 @@ export class RtwMeetingRepository {
     rm.updated_at AS "updatedAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    sickness_case_id AS "sicknessCaseId",
+    employee_id AS "employeeId",
+    scheduled_by AS "scheduledBy",
+    scheduled_date AS "scheduledDate",
+    completed_date AS "completedDate",
+    status,
+    questionnaire_responses AS "questionnaireResponses",
+    outcomes_encrypted AS "outcomesEncrypted",
+    adjustments,
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   /**
    * Create a new RTW meeting record.
    */
@@ -43,7 +59,7 @@ export class RtwMeetingRepository {
         scheduled_date, status
       )
       VALUES ($1, $2, $3, $4, $5, 'SCHEDULED')
-      RETURNING ${RtwMeetingRepository.SELECT_COLUMNS}`,
+      RETURNING ${RtwMeetingRepository.RETURNING_COLUMNS}`,
       [data.organisationId, data.sicknessCaseId, data.employeeId, data.scheduledBy, data.scheduledDate],
     );
 
@@ -124,10 +140,10 @@ export class RtwMeetingRepository {
     values.push(id);
 
     const result = await queryFn(
-      `UPDATE rtw_meetings rm
+      `UPDATE rtw_meetings
       SET ${setClauses.join(", ")}
-      WHERE rm.id = $${paramIndex}
-      RETURNING ${RtwMeetingRepository.SELECT_COLUMNS}`,
+      WHERE id = $${paramIndex}
+      RETURNING ${RtwMeetingRepository.RETURNING_COLUMNS}`,
       values,
     );
 

@@ -20,6 +20,19 @@ export class TriggerConfigRepository {
     tc.updated_at AS "updatedAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    name,
+    trigger_type AS "triggerType",
+    threshold_value AS "thresholdValue",
+    period_days AS "periodDays",
+    is_active AS "isActive",
+    created_by AS "createdBy",
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   /**
    * Find all trigger configs for an organisation, ordered by created_at.
    */
@@ -86,7 +99,7 @@ export class TriggerConfigRepository {
     const result = await queryFn(
       `INSERT INTO trigger_configs (organisation_id, name, trigger_type, threshold_value, period_days, is_active, created_by)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING ${TriggerConfigRepository.SELECT_COLUMNS}`,
+      RETURNING ${TriggerConfigRepository.RETURNING_COLUMNS}`,
       [
         data.organisationId,
         data.name,
@@ -145,10 +158,10 @@ export class TriggerConfigRepository {
     values.push(id);
 
     const result = await queryFn(
-      `UPDATE trigger_configs tc
+      `UPDATE trigger_configs
       SET ${setClauses.join(", ")}
-      WHERE tc.id = $${paramIndex}
-      RETURNING ${TriggerConfigRepository.SELECT_COLUMNS}`,
+      WHERE id = $${paramIndex}
+      RETURNING ${TriggerConfigRepository.RETURNING_COLUMNS}`,
       values,
     );
 

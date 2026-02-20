@@ -17,6 +17,16 @@ export class GuidanceRepository {
     ge.engaged_at AS "engagedAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    sickness_case_id AS "sicknessCaseId",
+    user_id AS "userId",
+    guidance_type AS "guidanceType",
+    guidance_step AS "guidanceStep",
+    engaged_at AS "engagedAt"
+  `;
+
   /**
    * Create a guidance engagement record.
    */
@@ -36,7 +46,7 @@ export class GuidanceRepository {
         organisation_id, sickness_case_id, user_id, guidance_type, guidance_step
       )
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING ${GuidanceRepository.SELECT_COLUMNS}`,
+      RETURNING ${GuidanceRepository.RETURNING_COLUMNS}`,
       [data.organisationId, data.sicknessCaseId, data.userId, data.guidanceType, data.guidanceStep],
     );
 

@@ -3,7 +3,7 @@ import { MilestoneGuidanceRecord } from "@/types/database";
 import { PoolClient } from "pg";
 
 /**
- * MilestoneGuidance repository -- read operations for milestone guidance content.
+ * MilestoneGuidance repository -- CRUD operations for milestone guidance content.
  * All queries use parameterised SQL with snake_case columns aliased to camelCase.
  */
 export class MilestoneGuidanceRepository {
@@ -19,6 +19,20 @@ export class MilestoneGuidanceRepository {
     mg.is_default AS "isDefault",
     mg.created_at AS "createdAt",
     mg.updated_at AS "updatedAt"
+  `;
+
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    milestone_key AS "milestoneKey",
+    action_title AS "actionTitle",
+    manager_guidance AS "managerGuidance",
+    suggested_text AS "suggestedText",
+    instructions,
+    employee_view AS "employeeView",
+    is_default AS "isDefault",
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
   `;
 
   /**
@@ -84,5 +98,131 @@ export class MilestoneGuidanceRepository {
       [milestoneKey],
     );
     return result.rows[0] || null;
+  }
+
+  /**
+   * Find guidance for a specific org + milestone key combination.
+   */
+  static async findByOrgAndKey(
+    orgId: string,
+    milestoneKey: string,
+    client?: PoolClient,
+  ): Promise<MilestoneGuidanceRecord | null> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const result = await queryFn(
+      `SELECT ${MilestoneGuidanceRepository.SELECT_COLUMNS}
+      FROM milestone_guidance mg
+      WHERE mg.organisation_id = $1 AND mg.milestone_key = $2`,
+      [orgId, milestoneKey],
+    );
+
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Create a new milestone guidance entry.
+   */
+  static async create(
+    data: {
+      organisationId: string;
+      milestoneKey: string;
+      actionTitle: string;
+      managerGuidance: string;
+      suggestedText: string;
+      instructions: string[];
+      employeeView: string;
+    },
+    client?: PoolClient,
+  ): Promise<MilestoneGuidanceRecord> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const result = await queryFn(
+      `INSERT INTO milestone_guidance (organisation_id, milestone_key, action_title, manager_guidance, suggested_text, instructions, employee_view, is_default)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, false)
+      RETURNING ${MilestoneGuidanceRepository.RETURNING_COLUMNS}`,
+      [
+        data.organisationId,
+        data.milestoneKey,
+        data.actionTitle,
+        data.managerGuidance,
+        data.suggestedText,
+        JSON.stringify(data.instructions),
+        data.employeeView,
+      ],
+    );
+
+    return result.rows[0];
+  }
+
+  /**
+   * Update a milestone guidance entry (partial update).
+   */
+  static async update(
+    id: string,
+    data: {
+      actionTitle?: string;
+      managerGuidance?: string;
+      suggestedText?: string;
+      instructions?: string[];
+      employeeView?: string;
+    },
+    client?: PoolClient,
+  ): Promise<MilestoneGuidanceRecord> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const setClauses: string[] = [];
+    const values: (string | null)[] = [];
+    let paramIndex = 1;
+
+    if (data.actionTitle !== undefined) {
+      setClauses.push(`action_title = $${paramIndex++}`);
+      values.push(data.actionTitle);
+    }
+    if (data.managerGuidance !== undefined) {
+      setClauses.push(`manager_guidance = $${paramIndex++}`);
+      values.push(data.managerGuidance);
+    }
+    if (data.suggestedText !== undefined) {
+      setClauses.push(`suggested_text = $${paramIndex++}`);
+      values.push(data.suggestedText);
+    }
+    if (data.instructions !== undefined) {
+      setClauses.push(`instructions = $${paramIndex++}`);
+      values.push(JSON.stringify(data.instructions));
+    }
+    if (data.employeeView !== undefined) {
+      setClauses.push(`employee_view = $${paramIndex++}`);
+      values.push(data.employeeView);
+    }
+
+    setClauses.push("updated_at = NOW()");
+    values.push(id);
+
+    const result = await queryFn(
+      `UPDATE milestone_guidance
+      SET ${setClauses.join(", ")}
+      WHERE id = $${paramIndex}
+      RETURNING ${MilestoneGuidanceRepository.RETURNING_COLUMNS}`,
+      values,
+    );
+
+    return result.rows[0];
+  }
+
+  /**
+   * Delete a milestone guidance entry (hard delete).
+   */
+  static async delete(id: string, client?: PoolClient): Promise<void> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    await queryFn("DELETE FROM milestone_guidance WHERE id = $1", [id]);
+  }
+
+  /**
+   * Delete guidance override by org + milestone key (for reset-to-default flow).
+   */
+  static async deleteByOrgAndKey(orgId: string, milestoneKey: string, client?: PoolClient): Promise<void> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    await queryFn("DELETE FROM milestone_guidance WHERE organisation_id = $1 AND milestone_key = $2", [
+      orgId,
+      milestoneKey,
+    ]);
   }
 }

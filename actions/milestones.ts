@@ -1,10 +1,10 @@
-import { MilestoneConfig } from "@/types/database";
+import { MilestoneConfig, MilestoneConfigWithGuidance } from "@/types/database";
 import { CreateMilestoneConfigInput, UpdateMilestoneConfigInput } from "@/schemas/milestone-config";
 
 /**
  * Fetch effective milestones for an organisation (defaults merged with overrides).
  */
-export async function fetchMilestones(slug: string): Promise<{ milestones: MilestoneConfig[] }> {
+export async function fetchMilestones(slug: string): Promise<{ milestones: MilestoneConfigWithGuidance[] }> {
   const res = await fetch(`/api/organisations/${slug}/milestones`);
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
@@ -71,7 +71,7 @@ export async function deleteMilestoneOverride(slug: string, id: string): Promise
 /**
  * Fetch effective milestones for the session user's current organisation.
  */
-export async function fetchSessionMilestones(): Promise<{ milestones: MilestoneConfig[] }> {
+export async function fetchSessionMilestones(): Promise<{ milestones: MilestoneConfigWithGuidance[] }> {
   const res = await fetch("/api/milestones");
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));

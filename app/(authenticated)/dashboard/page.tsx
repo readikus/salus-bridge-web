@@ -9,8 +9,8 @@ import { TenantService } from "@/providers/services/tenant.service";
 import { MilestoneActionWithDetails } from "@/types/database";
 import { UserRole } from "@/types/enums";
 import { OutstandingActions } from "@/components/outstanding-actions";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Building2, UserCircle, FileText, Heart, Calendar } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, UserCircle, FileText, Heart, Calendar } from "lucide-react";
 
 const ACTIVE_STATUSES = ["REPORTED", "TRACKING", "FIT_NOTE_RECEIVED", "RTW_SCHEDULED"];
 
@@ -20,8 +20,8 @@ export default async function DashboardPage() {
 
   const roles = sessionUser.roles.map((r) => r.role);
 
-  // Platform admin: redirect to organisations
-  if (sessionUser.isSuperAdmin || roles.includes(UserRole.PLATFORM_ADMIN)) {
+  // Platform admin with no org context: redirect to organisations
+  if ((sessionUser.isSuperAdmin || roles.includes(UserRole.PLATFORM_ADMIN)) && !sessionUser.currentOrganisationId) {
     redirect("/organisations");
   }
 
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
           <p className="mt-1 text-sm text-gray-500">Overview of your organisation.</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
@@ -72,24 +72,6 @@ export default async function DashboardPage() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.employeeCount}</div>
               <p className="text-xs text-gray-500">{stats.activeEmployeeCount} active</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Departments</CardTitle>
-              <Building2 className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.departmentCount}</div>
-              <p className="text-xs text-gray-500">
-                {stats.departments.length > 0
-                  ? stats.departments
-                      .slice(0, 3)
-                      .map((d) => d.name)
-                      .join(", ")
-                  : "No departments yet"}
-              </p>
             </CardContent>
           </Card>
 
@@ -118,43 +100,18 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        {outstandingActions.length > 0 && (
-          <div className="col-span-full">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Outstanding Actions</CardTitle>
-                <FileText className="h-4 w-4 text-gray-500" />
-              </CardHeader>
-              <CardContent>
-                <OutstandingActions actions={outstandingActions} />
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <div className="mt-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Outstanding Actions</CardTitle>
+              <FileText className="h-4 w-4 text-gray-500" />
+            </CardHeader>
+            <CardContent>
+              <OutstandingActions actions={outstandingActions} />
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Department breakdown */}
-        {stats.departments.length > 0 && (
-          <div className="mt-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Departments</CardTitle>
-                <CardDescription>Breakdown of employees by department.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {stats.departments.map((dept) => (
-                    <div
-                      key={dept.id}
-                      className="flex items-center justify-between rounded-md border border-gray-200 p-3"
-                    >
-                      <span className="text-sm font-medium text-gray-700">{dept.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     );
   }

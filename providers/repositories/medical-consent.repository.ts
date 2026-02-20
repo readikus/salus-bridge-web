@@ -20,6 +20,19 @@ export class MedicalConsentRepository {
     mc.updated_at AS "updatedAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    employee_id AS "employeeId",
+    consented_by AS "consentedBy",
+    consent_status AS "consentStatus",
+    consent_date AS "consentDate",
+    revoked_date AS "revokedDate",
+    notes,
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   /**
    * Find the consent record for an employee (single row due to UNIQUE constraint).
    */
@@ -85,7 +98,7 @@ export class MedicalConsentRepository {
         revoked_date = ${revokedDate},
         notes = EXCLUDED.notes,
         updated_at = NOW()
-      RETURNING ${MedicalConsentRepository.SELECT_COLUMNS}`,
+      RETURNING ${MedicalConsentRepository.RETURNING_COLUMNS}`,
       [data.organisationId, data.employeeId, data.consentedBy, data.consentStatus, data.notes || null],
     );
 

@@ -25,8 +25,8 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (isPublicPath) {
-    // If user is logged in and hits /login, redirect to dashboard
-    if (user && request.nextUrl.pathname === "/login") {
+    // If user is logged in and hits / or /login, redirect to dashboard
+    if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/")) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     return response;

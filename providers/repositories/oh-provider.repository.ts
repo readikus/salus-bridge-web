@@ -21,6 +21,20 @@ export class OhProviderRepository {
     p.updated_at AS "updatedAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    name,
+    contact_email AS "contactEmail",
+    contact_phone AS "contactPhone",
+    address,
+    notes,
+    is_active AS "isActive",
+    created_by AS "createdBy",
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   /**
    * Find all providers for an organisation, ordered by name.
    */
@@ -73,7 +87,7 @@ export class OhProviderRepository {
         organisation_id, name, contact_email, contact_phone, address, notes, created_by
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING ${OhProviderRepository.SELECT_COLUMNS}`,
+      RETURNING ${OhProviderRepository.RETURNING_COLUMNS}`,
       [
         data.organisationId,
         data.name,
@@ -137,10 +151,10 @@ export class OhProviderRepository {
     values.push(id as string);
 
     const result = await queryFn(
-      `UPDATE oh_providers p
+      `UPDATE oh_providers
       SET ${setClauses.join(", ")}
-      WHERE p.id = $${paramIndex}
-      RETURNING ${OhProviderRepository.SELECT_COLUMNS}`,
+      WHERE id = $${paramIndex}
+      RETURNING ${OhProviderRepository.RETURNING_COLUMNS}`,
       values,
     );
 

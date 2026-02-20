@@ -19,6 +19,17 @@ export class CommunicationLogRepository {
     cl.created_at AS "createdAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    sickness_case_id AS "sicknessCaseId",
+    author_id AS "authorId",
+    contact_date AS "contactDate",
+    contact_type AS "contactType",
+    notes,
+    created_at AS "createdAt"
+  `;
+
   /**
    * Find all communication log entries for a sickness case, with author details.
    * Sorted by contact_date DESC, created_at DESC (most recent first).
@@ -77,7 +88,7 @@ export class CommunicationLogRepository {
     const result = await queryFn(
       `INSERT INTO communication_logs (organisation_id, sickness_case_id, author_id, contact_date, contact_type, notes)
       VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING ${CommunicationLogRepository.SELECT_COLUMNS}`,
+      RETURNING ${CommunicationLogRepository.RETURNING_COLUMNS}`,
       [data.organisationId, data.sicknessCaseId, data.authorId, data.contactDate, data.contactType, data.notes],
     );
 

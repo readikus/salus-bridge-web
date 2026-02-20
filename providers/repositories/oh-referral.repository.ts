@@ -34,6 +34,22 @@ export class OhReferralRepository {
     r.updated_at AS "updatedAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    sickness_case_id AS "sicknessCaseId",
+    employee_id AS "employeeId",
+    provider_id AS "providerId",
+    referred_by AS "referredBy",
+    status,
+    reason,
+    urgency,
+    report_received_at AS "reportReceivedAt",
+    report_notes_encrypted AS "reportNotesEncrypted",
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   private static readonly SELECT_WITH_DETAILS = `
     ${OhReferralRepository.SELECT_COLUMNS},
     u.first_name AS "employeeFirstName",
@@ -142,7 +158,7 @@ export class OhReferralRepository {
         referred_by, reason, urgency
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING ${OhReferralRepository.SELECT_COLUMNS}`,
+      RETURNING ${OhReferralRepository.RETURNING_COLUMNS}`,
       [
         data.organisationId,
         data.sicknessCaseId,
@@ -182,10 +198,10 @@ export class OhReferralRepository {
     }
 
     const result = await queryFn(
-      `UPDATE oh_referrals r
+      `UPDATE oh_referrals
       SET ${setClauses.join(", ")}
-      WHERE r.id = $1
-      RETURNING ${OhReferralRepository.SELECT_COLUMNS}`,
+      WHERE id = $1
+      RETURNING ${OhReferralRepository.RETURNING_COLUMNS}`,
       values,
     );
 

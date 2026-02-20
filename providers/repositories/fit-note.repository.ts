@@ -30,6 +30,24 @@ export class FitNoteRepository {
     fn.created_at AS "createdAt"
   `;
 
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    sickness_case_id AS "sicknessCaseId",
+    employee_id AS "employeeId",
+    uploaded_by AS "uploadedBy",
+    storage_path AS "storagePath",
+    file_name AS "fileName",
+    file_size_bytes AS "fileSizeBytes",
+    content_type AS "contentType",
+    fit_note_status AS "fitNoteStatus",
+    start_date AS "startDate",
+    end_date AS "endDate",
+    functional_effects AS "functionalEffects",
+    notes_encrypted AS "notesEncrypted",
+    created_at AS "createdAt"
+  `;
+
   /**
    * Create a new fit note record.
    */
@@ -59,7 +77,7 @@ export class FitNoteRepository {
         fit_note_status, start_date, end_date, functional_effects, notes_encrypted
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-      RETURNING ${FitNoteRepository.SELECT_COLUMNS}`,
+      RETURNING ${FitNoteRepository.RETURNING_COLUMNS}`,
       [
         data.organisationId,
         data.sicknessCaseId,

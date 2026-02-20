@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { createServerClient } from "@/providers/supabase/client";
 import { AuthService } from "@/providers/services/auth.service";
 import { SessionUser } from "@/types/auth";
+import { ORG_COOKIE_NAME } from "@/constants/org-cookie";
 
 /**
  * Get the authenticated Supabase user from the current session.
@@ -30,8 +32,12 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
   const supabaseUser = await getSupabaseUser();
   if (!supabaseUser) return null;
 
+  // Read preferred org from cookie (if set)
+  const cookieStore = await cookies();
+  const preferredOrgId = cookieStore.get(ORG_COOKIE_NAME)?.value || null;
+
   // Look up or create the local user
-  let sessionUser = await AuthService.getSessionUser(supabaseUser.id);
+  let sessionUser = await AuthService.getSessionUser(supabaseUser.id, preferredOrgId);
 
   if (!sessionUser) {
     // First login — create local user from Supabase auth profile
