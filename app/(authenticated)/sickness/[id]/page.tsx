@@ -75,7 +75,6 @@ export default function SicknessCaseDetailPage() {
 
       <SicknessCaseDetail
         sicknessCase={data.sicknessCase}
-        transitions={data.transitions}
         canManage={data.canManage}
       />
 

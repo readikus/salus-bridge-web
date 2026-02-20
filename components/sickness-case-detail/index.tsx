@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, ArrowRight, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { fetchUpdateSicknessCase } from "@/actions/sickness-cases";
-import { SicknessCase, CaseTransition } from "@/types/database";
+import { SicknessCase } from "@/types/database";
 import { ABSENCE_TYPE_LABELS, AbsenceType } from "@/constants/absence-types";
 
 interface Props {
   sicknessCase: SicknessCase & { notes?: string };
-  transitions: CaseTransition[];
   canManage: boolean;
 }
 
@@ -32,7 +31,7 @@ function formatStatus(status: string): string {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function SicknessCaseDetail({ sicknessCase, transitions, canManage }: Props) {
+export function SicknessCaseDetail({ sicknessCase, canManage }: Props) {
   const router = useRouter();
   const [hasError, setHasError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -162,37 +161,6 @@ export function SicknessCaseDetail({ sicknessCase, transitions, canManage }: Pro
         )}
       </div>
 
-      {/* Transition Timeline */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-gray-900">Transition Timeline</h3>
-        {transitions.length === 0 ? (
-          <p className="mt-3 text-sm text-gray-500">No transitions yet. Case was just reported.</p>
-        ) : (
-          <div className="mt-4 space-y-4">
-            {transitions.map((transition, index) => (
-              <div key={transition.id} className="flex gap-3">
-                <div className="flex flex-col items-center">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
-                    <Clock className="h-3 w-3 text-blue-600" />
-                  </div>
-                  {index < transitions.length - 1 && <div className="h-full w-px bg-gray-200" />}
-                </div>
-                <div className="pb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">
-                      {formatStatus(transition.fromStatus || "NEW")}
-                    </span>
-                    <ArrowRight className="h-3 w-3 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-900">{formatStatus(transition.toStatus)}</span>
-                  </div>
-                  <p className="mt-0.5 text-xs text-gray-500">{formatDate(transition.createdAt)}</p>
-                  {transition.notes && <p className="mt-1 text-sm text-gray-600">{transition.notes}</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

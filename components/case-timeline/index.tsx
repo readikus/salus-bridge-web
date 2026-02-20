@@ -204,6 +204,16 @@ function MilestoneCard({
         </div>
       </button>
 
+      {/* Completed notes — always visible without expanding */}
+      {isCompleted && action?.notes && (
+        <div className="border-t border-gray-100 px-5 py-3">
+          <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
+            <p className="text-xs font-medium text-gray-500 mb-1">Notes</p>
+            {action.notes}
+          </div>
+        </div>
+      )}
+
       {/* Expanded content */}
       {isExpanded && (
         <div className="border-t border-gray-100 px-5 py-4 space-y-3">
@@ -246,14 +256,6 @@ function MilestoneCard({
                 </div>
               )}
             </>
-          )}
-
-          {/* Completed details (no action controls) */}
-          {isCompleted && action?.notes && (
-            <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
-              <p className="text-xs font-medium text-gray-500 mb-1">Notes</p>
-              {action.notes}
-            </div>
           )}
 
           {/* Action controls for actionable cards */}

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { Sidebar } from "@/components/sidebar";
+import { QueryProvider } from "@/components/query-provider";
 import { UserRole } from "@/types/enums";
 
 export default async function AuthenticatedLayout({
@@ -28,7 +29,9 @@ export default async function AuthenticatedLayout({
         isSuperAdmin={sessionUser.isSuperAdmin}
       />
       <main className="flex-1 overflow-y-auto">
-        <div className="p-8">{children}</div>
+        <QueryProvider>
+          <div className="p-8">{children}</div>
+        </QueryProvider>
       </main>
     </div>
   );
