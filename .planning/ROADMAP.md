@@ -92,10 +92,11 @@ Plans:
   1. Each active sickness case shows a red/yellow/green risk indicator based on whether milestone actions are overdue, upcoming, or completed
   2. Dashboard shows escalating deadline alerts for milestones approaching their due date
   3. Manager or HR can view a single page showing all active cases with their compliance status, sortable and filterable
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — TBD
+- [ ] 06-01-PLAN.md — Compliance service, API route, types, permissions, and nav integration
+- [ ] 06-02-PLAN.md — Compliance dashboard page with summary cards, sortable/filterable table, and risk badges
 
 ## Progress
 
@@ -109,4 +110,4 @@ Phases execute in numeric order: 4 -> 5 -> 6
 | 3. Monitoring & Intelligence | v1.0 | 3/3 | Complete | 2026-02-17 |
 | 4. Timeline Engine & GP Details | v1.2 | 3/3 | Complete | 2026-02-19 |
 | 5. Milestone Actions & Communication Log | v1.2 | 0/3 | Planning complete | - |
-| 6. Compliance Dashboard | v1.2 | 0/? | Not started | - |
+| 6. Compliance Dashboard | v1.2 | 0/2 | Planning complete | - |
