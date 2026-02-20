@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 5 of 6 (Milestone Actions & Communication Log)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-02-19 -- Phase 4 verified and complete
+Plan: 1 of 3 in current phase
+Status: Executing
+Last activity: 2026-02-20 -- Completed 05-01-PLAN.md
 
-Progress: [████████████████░░░░] 80% (18/~21 plans across all milestones)
+Progress: [█████████████████░░░] 86% (19/~22 plans across all milestones)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 8min
 - Total execution time: 2.1 hours
 
@@ -31,6 +31,7 @@ Progress: [████████████████░░░░] 80% (18
 | 02-sickness-lifecycle | 5/5 | 76min | 15min |
 | 03-monitoring-and-intelligence | 3/3 | 26min | 9min |
 | 04-timeline-engine-and-gp-details | 3/3 | 11min | 4min |
+| 05-milestone-actions-and-communication-log | 1/3 | 2min | 2min |
 
 *Updated after each plan completion*
 
@@ -55,6 +56,8 @@ Recent decisions affecting current work:
 - Single consent record per employee with upsert pattern
 - Ownership-based access control for GP details (employee.userId === sessionUser.id)
 - Employee ID resolved via fetchMyData on profile page
+- [Phase 05]: Immutability enforced at both DB level (no UPDATE/DELETE grants) and code level (no update/delete methods)
+- [Phase 05]: Bulk insert method on MilestoneActionRepository for efficient timeline generation
 
 ### Pending Todos
 
@@ -73,5 +76,5 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Phase 4 executed and verified -- ready to plan Phase 5
+Last session: 2026-02-20
+Stopped at: Completed 05-01-PLAN.md
