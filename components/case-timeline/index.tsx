@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 import { fetchCaseTimeline } from "@/actions/sickness-cases";
 import { CaseTimelineEntry } from "@/providers/services/milestone.service";
-import { CheckCircle2, Clock, Circle } from "lucide-react";
+import { AlertCircle, Clock, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {
   caseId: string;
+  onTimelineLoaded?: (timeline: CaseTimelineEntry[]) => void;
 }
+
+export type { CaseTimelineEntry } from "@/providers/services/milestone.service";
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr + "T00:00:00");
@@ -17,8 +20,8 @@ function formatDate(dateStr: string): string {
 
 function StatusIcon({ status }: { status: CaseTimelineEntry["status"] }) {
   switch (status) {
-    case "PASSED":
-      return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+    case "OVERDUE":
+      return <AlertCircle className="h-5 w-5 text-red-500" />;
     case "DUE_TODAY":
       return <Clock className="h-5 w-5 animate-pulse text-amber-500" />;
     case "UPCOMING":
@@ -28,10 +31,10 @@ function StatusIcon({ status }: { status: CaseTimelineEntry["status"] }) {
 
 function StatusBadge({ status }: { status: CaseTimelineEntry["status"] }) {
   switch (status) {
-    case "PASSED":
+    case "OVERDUE":
       return (
-        <Badge variant="secondary" className="bg-green-50 text-green-700">
-          Passed
+        <Badge variant="secondary" className="bg-red-50 text-red-700">
+          Overdue
         </Badge>
       );
     case "DUE_TODAY":
@@ -49,16 +52,20 @@ function StatusBadge({ status }: { status: CaseTimelineEntry["status"] }) {
   }
 }
 
-export function CaseTimeline({ caseId }: Props) {
+export function CaseTimeline({ caseId, onTimelineLoaded }: Props) {
   const [timeline, setTimeline] = useState<CaseTimelineEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCaseTimeline(caseId)
-      .then((res) => setTimeline(res.timeline))
+      .then((res) => {
+        setTimeline(res.timeline);
+        onTimelineLoaded?.(res.timeline);
+      })
       .catch((err: any) => setHasError(err.message))
       .finally(() => setIsLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caseId]);
 
   if (isLoading) {
@@ -89,11 +96,11 @@ export function CaseTimeline({ caseId }: Props) {
             </div>
 
             {/* Content */}
-            <div className={`flex-1 pb-2 ${entry.status === "PASSED" ? "opacity-60" : ""}`}>
+            <div className="flex-1 pb-2">
               <div className="flex items-center gap-2">
                 <span
                   className={`text-sm font-medium ${
-                    entry.status === "DUE_TODAY" ? "text-amber-700" : entry.status === "PASSED" ? "text-gray-500" : "text-gray-900"
+                    entry.status === "OVERDUE" ? "text-red-700" : entry.status === "DUE_TODAY" ? "text-amber-700" : "text-gray-900"
                   }`}
                 >
                   {entry.milestone.label}

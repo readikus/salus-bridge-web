@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { SicknessCaseDetail } from "@/components/sickness-case-detail";
 import { CaseTimeline } from "@/components/case-timeline";
+import { MilestoneActionCards } from "@/components/milestone-action-cards";
+import { CaseTimelineEntry } from "@/providers/services/milestone.service";
 import { fetchSicknessCase, SicknessCaseDetailResponse } from "@/actions/sickness-cases";
 
 export default function SicknessCaseDetailPage() {
@@ -13,6 +15,7 @@ export default function SicknessCaseDetailPage() {
   const [data, setData] = useState<SicknessCaseDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState<string | null>(null);
+  const [timeline, setTimeline] = useState<CaseTimelineEntry[]>([]);
 
   useEffect(() => {
     if (!params.id) return;
@@ -77,10 +80,16 @@ export default function SicknessCaseDetailPage() {
       />
 
       {isActiveCaseForTimeline && (
-        <div className="mt-8">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900">Absence Timeline</h2>
-          <CaseTimeline caseId={params.id} />
-        </div>
+        <>
+          <div className="mt-8">
+            <MilestoneActionCards timeline={timeline} />
+          </div>
+
+          <div className="mt-8">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900">Absence Timeline</h2>
+            <CaseTimeline caseId={params.id} onTimelineLoaded={setTimeline} />
+          </div>
+        </>
       )}
     </div>
   );

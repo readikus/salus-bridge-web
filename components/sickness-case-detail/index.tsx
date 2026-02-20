@@ -207,10 +207,6 @@ export function SicknessCaseDetail({ sicknessCase, transitions, availableActions
             ))}
           </div>
 
-          {/* Guidance prompt for managers (placeholder for 02-04) */}
-          <p className="mt-3 text-xs text-gray-400">
-            Manager guidance prompts will be available in a future update.
-          </p>
         </div>
       )}
 
