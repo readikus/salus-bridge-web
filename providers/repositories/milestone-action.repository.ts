@@ -212,6 +212,36 @@ export class MilestoneActionRepository {
   }
 
   /**
+   * Find outstanding (PENDING / IN_PROGRESS) milestone actions across an organisation,
+   * with employee name, milestone label, and case ID for dashboard display.
+   */
+  static async findOutstandingWithDetails(
+    organisationId: string,
+    client?: PoolClient,
+  ): Promise<(MilestoneActionWithDetails & { caseId: string })[]> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const result = await queryFn(
+      `SELECT ${MilestoneActionRepository.SELECT_COLUMNS},
+        COALESCE(mc.label, ma.milestone_key) AS "milestoneLabel",
+        u.first_name AS "employeeFirstName",
+        u.last_name AS "employeeLastName",
+        sc.id AS "caseId"
+      FROM milestone_actions ma
+      LEFT JOIN milestone_configs mc ON mc.milestone_key = ma.milestone_key
+        AND (mc.organisation_id = ma.organisation_id OR mc.organisation_id IS NULL)
+      LEFT JOIN sickness_cases sc ON sc.id = ma.sickness_case_id
+      LEFT JOIN employees e ON e.id = sc.employee_id
+      LEFT JOIN users u ON u.id = e.user_id
+      WHERE ma.organisation_id = $1 AND ma.status IN ('PENDING', 'IN_PROGRESS')
+      ORDER BY ma.due_date ASC
+      LIMIT 20`,
+      [organisationId],
+    );
+
+    return result.rows as (MilestoneActionWithDetails & { caseId: string })[];
+  }
+
+  /**
    * Find milestone actions by organisation and status (for compliance queries).
    */
   static async findByOrgAndStatus(
