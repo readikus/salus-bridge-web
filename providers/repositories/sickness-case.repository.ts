@@ -72,8 +72,10 @@ export class SicknessCaseRepository {
   static async findById(id: string, client?: PoolClient): Promise<SicknessCase | null> {
     const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
     const result = await queryFn(
-      `SELECT ${SicknessCaseRepository.SELECT_COLUMNS}
+      `SELECT ${SicknessCaseRepository.LIST_SELECT_COLUMNS}
       FROM sickness_cases sc
+      LEFT JOIN employees e ON sc.employee_id = e.id
+      LEFT JOIN users u ON e.user_id = u.id
       WHERE sc.id = $1`,
       [id],
     );

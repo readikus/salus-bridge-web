@@ -22,6 +22,22 @@ export class MilestoneActionRepository {
     ma.updated_at AS "updatedAt"
   `;
 
+  /** Column list without table alias — used in INSERT ... RETURNING where no alias is available. */
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    sickness_case_id AS "sicknessCaseId",
+    milestone_key AS "milestoneKey",
+    action_type AS "actionType",
+    status,
+    due_date AS "dueDate",
+    completed_by AS "completedBy",
+    completed_at AS "completedAt",
+    notes,
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   /**
    * Find all milestone actions for a sickness case, sorted by due date.
    */
@@ -98,7 +114,7 @@ export class MilestoneActionRepository {
     const result = await queryFn(
       `INSERT INTO milestone_actions (organisation_id, sickness_case_id, milestone_key, action_type, status, due_date)
       VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING ${MilestoneActionRepository.SELECT_COLUMNS}`,
+      RETURNING ${MilestoneActionRepository.RETURNING_COLUMNS}`,
       [data.organisationId, data.sicknessCaseId, data.milestoneKey, data.actionType, data.status, data.dueDate],
     );
 
@@ -141,7 +157,7 @@ export class MilestoneActionRepository {
     const result = await queryFn(
       `INSERT INTO milestone_actions (organisation_id, sickness_case_id, milestone_key, action_type, status, due_date)
       VALUES ${placeholders.join(", ")}
-      RETURNING ${MilestoneActionRepository.SELECT_COLUMNS}`,
+      RETURNING ${MilestoneActionRepository.RETURNING_COLUMNS}`,
       values,
     );
 
@@ -157,6 +173,7 @@ export class MilestoneActionRepository {
     status: string,
     completedBy?: string,
     notes?: string,
+    completedAt?: string,
     client?: PoolClient,
   ): Promise<MilestoneAction> {
     const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
@@ -166,12 +183,12 @@ export class MilestoneActionRepository {
       `UPDATE milestone_actions ma
       SET status = $1,
           completed_by = ${isCompleting ? "$3" : "completed_by"},
-          completed_at = ${isCompleting ? "now()" : "completed_at"},
+          completed_at = ${isCompleting ? "COALESCE($5::timestamptz, now())" : "completed_at"},
           notes = COALESCE($4, notes),
           updated_at = now()
       WHERE ma.id = $2
       RETURNING ${MilestoneActionRepository.SELECT_COLUMNS}`,
-      [status, id, completedBy ?? null, notes ?? null],
+      [status, id, completedBy ?? null, notes ?? null, completedAt ?? null],
     );
 
     return result.rows[0];

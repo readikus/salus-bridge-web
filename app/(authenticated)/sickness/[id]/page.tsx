@@ -1,13 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { SicknessCaseDetail } from "@/components/sickness-case-detail";
 import { CaseTimeline } from "@/components/case-timeline";
-import { MilestoneActionCards } from "@/components/milestone-action-cards";
-import { CaseTimelineEntry } from "@/providers/services/milestone.service";
 import { fetchSicknessCase, SicknessCaseDetailResponse } from "@/actions/sickness-cases";
 
 export default function SicknessCaseDetailPage() {
@@ -15,9 +13,8 @@ export default function SicknessCaseDetailPage() {
   const [data, setData] = useState<SicknessCaseDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState<string | null>(null);
-  const [timeline, setTimeline] = useState<CaseTimelineEntry[]>([]);
 
-  useEffect(() => {
+  const loadCase = useCallback(() => {
     if (!params.id) return;
 
     fetchSicknessCase(params.id)
@@ -31,6 +28,10 @@ export default function SicknessCaseDetailPage() {
         setIsLoading(false);
       });
   }, [params.id]);
+
+  useEffect(() => {
+    loadCase();
+  }, [loadCase]);
 
   if (isLoading) {
     return (
@@ -75,21 +76,18 @@ export default function SicknessCaseDetailPage() {
       <SicknessCaseDetail
         sicknessCase={data.sicknessCase}
         transitions={data.transitions}
-        availableActions={data.availableActions}
         canManage={data.canManage}
       />
 
       {isActiveCaseForTimeline && (
-        <>
-          <div className="mt-8">
-            <MilestoneActionCards timeline={timeline} />
-          </div>
-
-          <div className="mt-8">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900">Absence Timeline</h2>
-            <CaseTimeline caseId={params.id} onTimelineLoaded={setTimeline} />
-          </div>
-        </>
+        <div className="mt-8">
+          <CaseTimeline
+            caseId={params.id}
+            sicknessCase={data.sicknessCase}
+            canManage={data.canManage}
+            onCaseTransition={loadCase}
+          />
+        </div>
       )}
     </div>
   );

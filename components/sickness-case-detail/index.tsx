@@ -3,15 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, ArrowRight, Save } from "lucide-react";
-import { fetchTransitionCase, fetchUpdateSicknessCase } from "@/actions/sickness-cases";
+import { fetchUpdateSicknessCase } from "@/actions/sickness-cases";
 import { SicknessCase, CaseTransition } from "@/types/database";
-import { SicknessState, SicknessAction } from "@/constants/sickness-states";
 import { ABSENCE_TYPE_LABELS, AbsenceType } from "@/constants/absence-types";
 
 interface Props {
   sicknessCase: SicknessCase & { notes?: string };
   transitions: CaseTransition[];
-  availableActions: SicknessAction[];
   canManage: boolean;
 }
 
@@ -24,15 +22,6 @@ const STATUS_STYLES: Record<string, string> = {
   CLOSED: "bg-gray-100 text-gray-600",
 };
 
-const ACTION_LABELS: Record<string, string> = {
-  [SicknessAction.ACKNOWLEDGE]: "Acknowledge",
-  [SicknessAction.RECEIVE_FIT_NOTE]: "Receive Fit Note",
-  [SicknessAction.SCHEDULE_RTW]: "Schedule RTW Meeting",
-  [SicknessAction.COMPLETE_RTW]: "Complete RTW Meeting",
-  [SicknessAction.CLOSE_CASE]: "Close Case",
-  [SicknessAction.REOPEN]: "Reopen Case",
-};
-
 function formatDate(dateStr: string | Date | null): string {
   if (!dateStr) return "---";
   const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
@@ -43,11 +32,8 @@ function formatStatus(status: string): string {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function SicknessCaseDetail({ sicknessCase, transitions, availableActions, canManage }: Props) {
+export function SicknessCaseDetail({ sicknessCase, transitions, canManage }: Props) {
   const router = useRouter();
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionNotes, setTransitionNotes] = useState("");
-  const [showNotesModal, setShowNotesModal] = useState<SicknessAction | null>(null);
   const [hasError, setHasError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -76,20 +62,6 @@ export function SicknessCaseDetail({ sicknessCase, transitions, availableActions
       setHasError(err.message);
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const handleTransition = async (action: SicknessAction) => {
-    try {
-      setIsTransitioning(true);
-      setHasError(null);
-      await fetchTransitionCase(sicknessCase.id, action, transitionNotes || undefined);
-      setShowNotesModal(null);
-      setTransitionNotes("");
-      router.refresh();
-    } catch (err: any) {
-      setHasError(err.message);
-      setIsTransitioning(false);
     }
   };
 
@@ -190,65 +162,7 @@ export function SicknessCaseDetail({ sicknessCase, transitions, availableActions
         )}
       </div>
 
-      {/* Available actions */}
-      {canManage && availableActions.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h3 className="text-sm font-semibold text-gray-900">Available Actions</h3>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {availableActions.map((action) => (
-              <button
-                key={action}
-                onClick={() => setShowNotesModal(action)}
-                disabled={isTransitioning}
-                className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
-              >
-                {ACTION_LABELS[action] || action}
-              </button>
-            ))}
-          </div>
-
-        </div>
-      )}
-
-      {/* Transition notes modal */}
-      {showNotesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {ACTION_LABELS[showNotesModal] || showNotesModal}
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">Add optional notes for this transition.</p>
-            <textarea
-              value={transitionNotes}
-              onChange={(e) => setTransitionNotes(e.target.value)}
-              rows={3}
-              maxLength={2000}
-              className="mt-3 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="Optional notes..."
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                onClick={() => {
-                  setShowNotesModal(null);
-                  setTransitionNotes("");
-                }}
-                className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleTransition(showNotesModal)}
-                disabled={isTransitioning}
-                className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-              >
-                {isTransitioning ? "Processing..." : "Confirm"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Timeline */}
+      {/* Transition Timeline */}
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <h3 className="text-sm font-semibold text-gray-900">Transition Timeline</h3>
         {transitions.length === 0 ? (

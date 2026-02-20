@@ -125,7 +125,10 @@ export function AbsenceHistory({ cases, total, hideEmployeeName }: Props) {
       header: "",
       cell: (info) => (
         <button
-          onClick={() => router.push(`/sickness/${info.row.original.id}`)}
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/sickness/${info.row.original.id}`);
+          }}
           className="cursor-pointer text-sm text-blue-600 hover:text-blue-800"
         >
           View

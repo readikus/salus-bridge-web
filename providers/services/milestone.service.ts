@@ -11,7 +11,7 @@ import { PoolClient } from "pg";
 export interface CaseTimelineEntry {
   milestone: MilestoneConfig;
   dueDate: string; // ISO date string (YYYY-MM-DD)
-  status: "PASSED" | "DUE_TODAY" | "UPCOMING";
+  status: "OVERDUE" | "DUE_TODAY" | "UPCOMING";
   daysSinceStart: number;
 }
 
@@ -101,7 +101,7 @@ export class MilestoneService {
 
       let status: CaseTimelineEntry["status"];
       if (dueDate.getTime() < today.getTime()) {
-        status = "PASSED";
+        status = "OVERDUE";
       } else if (dueDate.getTime() === today.getTime()) {
         status = "DUE_TODAY";
       } else {

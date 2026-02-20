@@ -8,8 +8,8 @@ import { TenantService } from "@/providers/services/tenant.service";
 import { PERMISSIONS } from "@/constants/permissions";
 
 /**
- * GET /api/sickness-cases/[id]/timeline
- * Get the milestone timeline and associated actions for a specific sickness case.
+ * GET /api/sickness-cases/[id]/milestone-actions
+ * Return milestone actions for a case. Auto-creates PENDING actions if none exist.
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -23,23 +23,35 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Load the case to get the organisationId for tenant context
     const sicknessCase = await SicknessCaseRepository.findById(id);
     if (!sicknessCase) {
       return NextResponse.json({ error: "Sickness case not found" }, { status: 404 });
     }
 
-    const { timeline, actions } = await TenantService.withTenant(sicknessCase.organisationId, false, async (client) => {
-      const [tl, acts] = await Promise.all([
-        MilestoneService.getCaseTimeline(id, sicknessCase.organisationId, client),
-        MilestoneActionRepository.findBySicknessCase(id, client),
-      ]);
-      return { timeline: tl, actions: acts };
+    const actions = await TenantService.withTenant(sicknessCase.organisationId, false, async (client) => {
+      let existing = await MilestoneActionRepository.findBySicknessCase(id, client);
+
+      if (existing.length === 0) {
+        // Auto-create PENDING actions from the timeline milestones
+        const timeline = await MilestoneService.getCaseTimeline(id, sicknessCase.organisationId, client);
+        const actionsToCreate = timeline.map((entry) => ({
+          organisationId: sicknessCase.organisationId,
+          sicknessCaseId: id,
+          milestoneKey: entry.milestone.milestoneKey,
+          actionType: "MILESTONE",
+          status: "PENDING",
+          dueDate: entry.dueDate,
+        }));
+
+        existing = await MilestoneActionRepository.createMany(actionsToCreate, client);
+      }
+
+      return existing;
     });
 
-    return NextResponse.json({ timeline, actions });
+    return NextResponse.json({ actions });
   } catch (error) {
-    console.error("Error in GET /api/sickness-cases/[id]/timeline:", error);
+    console.error("Error in GET /api/sickness-cases/[id]/milestone-actions:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
