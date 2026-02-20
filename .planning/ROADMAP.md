@@ -77,11 +77,12 @@ Plans:
   3. At Weeks 2-3, the system initiates check-in prompts and fit note renewal reminders; at Week 4, HR/manager is prompted to request a GP or OH report; at Week 6, system prompts creation of a Plan of Action
   4. From Week 10 onward, evaluation meetings are scheduled every 4 weeks; at Week 52, a formal capability review is triggered
   5. Manager or HR can record a communication log entry (date, type, notes) against a sickness case, and all entries are immutable and timestamped
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — TBD
-- [ ] 05-02-PLAN.md — TBD
+- [ ] 05-01-PLAN.md — Database schema, types, enums, permissions, constants, Zod schemas, and repositories for milestone actions and communication log
+- [ ] 05-02-PLAN.md — Milestone action service, communication log service, API routes, client actions, and email template
+- [ ] 05-03-PLAN.md — Milestone actions UI, communication log UI, and case detail page integration
 
 #### Phase 6: Compliance Dashboard
 **Goal**: HR and managers can see real-time compliance risk across all active cases at a glance, with colour-coded indicators and deadline alerts
@@ -107,5 +108,5 @@ Phases execute in numeric order: 4 -> 5 -> 6
 | 2. Sickness Lifecycle | v1.0 | 5/5 | Complete | 2026-02-15 |
 | 3. Monitoring & Intelligence | v1.0 | 3/3 | Complete | 2026-02-17 |
 | 4. Timeline Engine & GP Details | v1.2 | 3/3 | Complete | 2026-02-19 |
-| 5. Milestone Actions & Communication Log | v1.2 | 0/? | Not started | - |
+| 5. Milestone Actions & Communication Log | v1.2 | 0/3 | Planning complete | - |
 | 6. Compliance Dashboard | v1.2 | 0/? | Not started | - |
