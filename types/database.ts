@@ -314,6 +314,44 @@ export interface MedicalRecordsConsentWithEmployee extends MedicalRecordsConsent
   employeeEmail: string | null;
 }
 
+export interface MilestoneAction {
+  id: string;
+  organisationId: string;
+  sicknessCaseId: string;
+  milestoneKey: string;
+  actionType: string;
+  status: string;
+  dueDate: string;
+  completedBy: string | null;
+  completedAt: Date | null;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MilestoneActionWithDetails extends MilestoneAction {
+  milestoneLabel: string;
+  employeeFirstName: string | null;
+  employeeLastName: string | null;
+}
+
+export interface CommunicationLogEntry {
+  id: string;
+  organisationId: string;
+  sicknessCaseId: string;
+  authorId: string;
+  contactDate: string;
+  contactType: string;
+  notes: string;
+  createdAt: Date;
+}
+
+export interface CommunicationLogEntryWithAuthor extends CommunicationLogEntry {
+  authorFirstName: string | null;
+  authorLastName: string | null;
+  authorEmail: string;
+}
+
 export interface AuditFilters extends PaginationOptions {
   entity?: string;
   action?: string;
