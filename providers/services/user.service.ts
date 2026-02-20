@@ -4,48 +4,45 @@ import { AuditLogService } from "@/providers/services/audit-log.service";
 import { SUPER_ADMIN_EMAILS } from "@/constants/roles";
 import { User } from "@/types/database";
 import { UserRole, AuditAction, AuditEntity } from "@/types/enums";
-import { Auth0Profile, SessionUser } from "@/types/auth";
+import { AuthProfile, SessionUser } from "@/types/auth";
 
 export class UserService {
   /**
-   * Find or create a local user from an Auth0 profile.
-   * Lookup order: auth0_id first, then email, then create new.
+   * Find or create a local user from an auth profile.
+   * Lookup order: supabase_auth_id first, then email, then create new.
    */
-  static async findOrCreateFromAuth0(auth0Profile: Auth0Profile): Promise<User> {
-    // 1. Try by Auth0 ID
-    let user = await UserRepository.findByAuth0Id(auth0Profile.sub);
+  static async findOrCreateFromAuth(authProfile: AuthProfile): Promise<User> {
+    // 1. Try by Supabase Auth ID
+    let user = await UserRepository.findBySupabaseAuthId(authProfile.id);
     if (user) {
       // Update name if changed
-      if (
-        auth0Profile.given_name !== user.firstName ||
-        auth0Profile.family_name !== user.lastName
-      ) {
+      if (authProfile.firstName !== user.firstName || authProfile.lastName !== user.lastName) {
         user = await UserRepository.update(user.id, {
-          firstName: auth0Profile.given_name || user.firstName,
-          lastName: auth0Profile.family_name || user.lastName,
+          firstName: authProfile.firstName || user.firstName,
+          lastName: authProfile.lastName || user.lastName,
         });
       }
       return user;
     }
 
-    // 2. Try by email (user might exist from invitation before Auth0 account was created)
-    user = await UserRepository.findByEmail(auth0Profile.email);
+    // 2. Try by email (user might exist from invitation before auth account was created)
+    user = await UserRepository.findByEmail(authProfile.email);
     if (user) {
-      // Link the Auth0 ID to the existing user
+      // Link the Supabase Auth ID to the existing user
       user = await UserRepository.update(user.id, {
-        auth0Id: auth0Profile.sub,
-        firstName: auth0Profile.given_name || user.firstName,
-        lastName: auth0Profile.family_name || user.lastName,
+        supabaseAuthId: authProfile.id,
+        firstName: authProfile.firstName || user.firstName,
+        lastName: authProfile.lastName || user.lastName,
       });
       return user;
     }
 
     // 3. Create new user
     user = await UserRepository.create({
-      email: auth0Profile.email,
-      auth0Id: auth0Profile.sub,
-      firstName: auth0Profile.given_name,
-      lastName: auth0Profile.family_name,
+      email: authProfile.email,
+      supabaseAuthId: authProfile.id,
+      firstName: authProfile.firstName,
+      lastName: authProfile.lastName,
     });
 
     await AuditLogService.log({
@@ -53,7 +50,7 @@ export class UserService {
       action: AuditAction.CREATE,
       entity: AuditEntity.USER,
       entityId: user.id,
-      metadata: { source: "auth0_login", auth0Id: auth0Profile.sub },
+      metadata: { source: "supabase_login", supabaseAuthId: authProfile.id },
     });
 
     return user;
@@ -82,7 +79,7 @@ export class UserService {
     return {
       id: user.id,
       email: user.email,
-      auth0Id: user.auth0Id!,
+      supabaseAuthId: user.supabaseAuthId!,
       firstName: user.firstName,
       lastName: user.lastName,
       roles,

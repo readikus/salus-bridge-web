@@ -34,6 +34,11 @@ export class OrganisationService {
 
     const org = await OrganisationRepository.create(params);
 
+    // Assign the creator as ORG_ADMIN
+    if (createdByUserId) {
+      await UserService.assignRole(createdByUserId, org.id, UserRole.ORG_ADMIN, createdByUserId);
+    }
+
     await AuditLogService.log({
       userId: createdByUserId,
       organisationId: org.id,

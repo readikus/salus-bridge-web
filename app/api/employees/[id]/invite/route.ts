@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { AuthService } from "@/providers/services/auth.service";
 import { InvitationService } from "@/providers/services/invitation.service";
 import { EmployeeRepository } from "@/providers/repositories/employee.repository";
@@ -7,27 +7,17 @@ import { AuditLogService } from "@/providers/services/audit-log.service";
 import { PERMISSIONS } from "@/constants/permissions";
 import { AuditAction, AuditEntity } from "@/types/enums";
 
-const auth0 = new Auth0Client();
-
 /**
  * POST /api/employees/[id]/invite
  * Trigger an invitation for a single employee.
  * Generates a magic link URL. Email delivery is deferred.
  * Org admin only.
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const organisationId = sessionUser.currentOrganisationId;

@@ -12,14 +12,17 @@ import {
 } from "lucide-react";
 import {
   fetchEmployee,
+  fetchEmployees,
   fetchUpdateEmployee,
   fetchDeactivateEmployee,
   fetchSendInvitation,
 } from "@/actions/employees";
+import { fetchSicknessCases } from "@/actions/sickness-cases";
 import { useAuth } from "@/hooks/use-auth";
 import { PERMISSIONS } from "@/constants/permissions";
-import { EmployeeWithDetails } from "@/types/database";
+import { EmployeeWithDetails, SicknessCase } from "@/types/database";
 import { UserRole, EmployeeStatus } from "@/types/enums";
+import { AbsenceHistory } from "@/components/absence-history";
 
 const ASSIGNABLE_ROLES = [
   { value: UserRole.EMPLOYEE, label: "Employee" },
@@ -44,17 +47,29 @@ export default function EmployeeDetailPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [jobTitle, setJobTitle] = useState("");
+  const [managerId, setManagerId] = useState("");
+  const [allEmployees, setAllEmployees] = useState<EmployeeWithDetails[]>([]);
+  const [cases, setCases] = useState<SicknessCase[]>([]);
+  const [casesTotal, setCasesTotal] = useState(0);
 
   const loadEmployee = useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await fetchEmployee(id);
+      const [data, employees, casesData] = await Promise.all([
+        fetchEmployee(id),
+        fetchEmployees(),
+        fetchSicknessCases({ employeeId: id }),
+      ]);
       setEmployee(data.employee);
       setRoles(data.roles);
       setFirstName(data.employee.firstName || "");
       setLastName(data.employee.lastName || "");
       setEmail(data.employee.email || "");
       setJobTitle(data.employee.jobTitle || "");
+      setManagerId(data.employee.managerId || "");
+      setAllEmployees(employees);
+      setCases(casesData.cases);
+      setCasesTotal(casesData.total);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -75,6 +90,7 @@ export default function EmployeeDetailPage() {
         lastName,
         email,
         jobTitle: jobTitle || null,
+        managerId: managerId || null,
         roles,
       });
       setEmployee(data.employee);
@@ -258,11 +274,21 @@ export default function EmployeeDetailPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Manager</label>
-                  <p className="mt-1 text-sm text-gray-600">
-                    {employee.managerFirstName
-                      ? `${employee.managerFirstName} ${employee.managerLastName}`
-                      : "Not assigned"}
-                  </p>
+                  <select
+                    value={managerId}
+                    onChange={(e) => setManagerId(e.target.value)}
+                    disabled={!canManage || isDeactivated}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  >
+                    <option value="">No manager</option>
+                    {allEmployees
+                      .filter((m) => m.id !== employee.id)
+                      .map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {[m.firstName, m.lastName].filter(Boolean).join(" ")} ({m.email})
+                        </option>
+                      ))}
+                  </select>
                 </div>
               </div>
 
@@ -344,6 +370,20 @@ export default function EmployeeDetailPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Absence History */}
+      <div className="mt-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-medium text-gray-900">Absence History</h2>
+          <Link
+            href="/sickness/report"
+            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+          >
+            Report Sickness
+          </Link>
+        </div>
+        <AbsenceHistory cases={cases} total={casesTotal} hideEmployeeName />
       </div>
     </div>
   );

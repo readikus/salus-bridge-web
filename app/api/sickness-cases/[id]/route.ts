@@ -104,12 +104,33 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const { id } = await params;
     const body = await request.json();
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-    // Only allow updating absenceEndDate
+    // If start date is provided, use updateDates (handles both dates together)
+    if (body.absenceStartDate) {
+      if (!dateRegex.test(body.absenceStartDate)) {
+        return NextResponse.json({ error: "Invalid start date format. Use YYYY-MM-DD." }, { status: 400 });
+      }
+      const endDate = body.absenceEndDate || null;
+      if (endDate && !dateRegex.test(endDate)) {
+        return NextResponse.json({ error: "Invalid end date format. Use YYYY-MM-DD." }, { status: 400 });
+      }
+
+      const updatedCase = await SicknessCaseService.updateDates(
+        id,
+        body.absenceStartDate,
+        endDate,
+        organisationId,
+        sessionUser.id,
+      );
+
+      return NextResponse.json({ sicknessCase: updatedCase });
+    }
+
+    // End date only update (existing behaviour)
     if (body.absenceEndDate) {
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
       if (!dateRegex.test(body.absenceEndDate)) {
-        return NextResponse.json({ error: "Invalid date format. Use YYYY-MM-DD." }, { status: 400 });
+        return NextResponse.json({ error: "Invalid end date format. Use YYYY-MM-DD." }, { status: 400 });
       }
 
       const updatedCase = await SicknessCaseService.updateEndDate(

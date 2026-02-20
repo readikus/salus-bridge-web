@@ -32,6 +32,40 @@ export class SicknessCaseRepository {
     sc.updated_at AS "updatedAt"
   `;
 
+  private static readonly LIST_SELECT_COLUMNS = `
+    sc.id,
+    sc.organisation_id AS "organisationId",
+    sc.employee_id AS "employeeId",
+    sc.reported_by AS "reportedBy",
+    sc.status,
+    sc.absence_type AS "absenceType",
+    sc.absence_start_date AS "absenceStartDate",
+    sc.absence_end_date AS "absenceEndDate",
+    sc.working_days_lost AS "workingDaysLost",
+    sc.notes_encrypted AS "notesEncrypted",
+    sc.is_long_term AS "isLongTerm",
+    sc.created_at AS "createdAt",
+    sc.updated_at AS "updatedAt",
+    u.first_name AS "employeeFirstName",
+    u.last_name AS "employeeLastName"
+  `;
+
+  private static readonly RETURNING_COLUMNS = `
+    id,
+    organisation_id AS "organisationId",
+    employee_id AS "employeeId",
+    reported_by AS "reportedBy",
+    status,
+    absence_type AS "absenceType",
+    absence_start_date AS "absenceStartDate",
+    absence_end_date AS "absenceEndDate",
+    working_days_lost AS "workingDaysLost",
+    notes_encrypted AS "notesEncrypted",
+    is_long_term AS "isLongTerm",
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
+
   /**
    * Find a sickness case by ID.
    */
@@ -91,7 +125,7 @@ export class SicknessCaseRepository {
     }
 
     const result = await queryFn(
-      `SELECT ${SicknessCaseRepository.SELECT_COLUMNS}
+      `SELECT ${SicknessCaseRepository.LIST_SELECT_COLUMNS}
       FROM sickness_cases sc
       LEFT JOIN employees e ON sc.employee_id = e.id
       LEFT JOIN users u ON e.user_id = u.id
@@ -109,8 +143,10 @@ export class SicknessCaseRepository {
   static async findByEmployee(employeeId: string, client?: PoolClient): Promise<SicknessCase[]> {
     const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
     const result = await queryFn(
-      `SELECT ${SicknessCaseRepository.SELECT_COLUMNS}
+      `SELECT ${SicknessCaseRepository.LIST_SELECT_COLUMNS}
       FROM sickness_cases sc
+      LEFT JOIN employees e ON sc.employee_id = e.id
+      LEFT JOIN users u ON e.user_id = u.id
       WHERE sc.employee_id = $1
       ORDER BY sc.created_at DESC`,
       [employeeId],
@@ -135,9 +171,11 @@ export class SicknessCaseRepository {
         UNION ALL
         SELECT e.id FROM employees e INNER JOIN team t ON e.manager_id = t.id
       )
-      SELECT ${SicknessCaseRepository.SELECT_COLUMNS}
+      SELECT ${SicknessCaseRepository.LIST_SELECT_COLUMNS}
       FROM sickness_cases sc
       INNER JOIN team t ON sc.employee_id = t.id
+      LEFT JOIN employees e ON sc.employee_id = e.id
+      LEFT JOIN users u ON e.user_id = u.id
       WHERE sc.organisation_id = $2
       ORDER BY sc.created_at DESC`,
       [managerId, organisationId],
@@ -168,7 +206,7 @@ export class SicknessCaseRepository {
         absence_start_date, absence_end_date, notes_encrypted
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING ${SicknessCaseRepository.SELECT_COLUMNS}`,
+      RETURNING ${SicknessCaseRepository.RETURNING_COLUMNS}`,
       [
         data.organisationId,
         data.employeeId,
@@ -194,7 +232,7 @@ export class SicknessCaseRepository {
       `UPDATE sickness_cases
       SET status = $2, updated_at = NOW()
       WHERE id = $1
-      RETURNING ${SicknessCaseRepository.SELECT_COLUMNS}`,
+      RETURNING ${SicknessCaseRepository.RETURNING_COLUMNS}`,
       [id, status],
     );
 
@@ -215,8 +253,30 @@ export class SicknessCaseRepository {
       `UPDATE sickness_cases
       SET absence_end_date = $2, working_days_lost = $3, updated_at = NOW()
       WHERE id = $1
-      RETURNING ${SicknessCaseRepository.SELECT_COLUMNS}`,
+      RETURNING ${SicknessCaseRepository.RETURNING_COLUMNS}`,
       [id, endDate, workingDaysLost],
+    );
+
+    return result.rows[0];
+  }
+
+  /**
+   * Update dates and recalculated working days for a sickness case.
+   */
+  static async updateDates(
+    id: string,
+    startDate: string,
+    endDate: string | null,
+    workingDaysLost: number | null,
+    client?: PoolClient,
+  ): Promise<SicknessCase> {
+    const queryFn = client ? client.query.bind(client) : pool.query.bind(pool);
+    const result = await queryFn(
+      `UPDATE sickness_cases
+      SET absence_start_date = $2, absence_end_date = $3, working_days_lost = $4, updated_at = NOW()
+      WHERE id = $1
+      RETURNING ${SicknessCaseRepository.RETURNING_COLUMNS}`,
+      [id, startDate, endDate, workingDaysLost],
     );
 
     return result.rows[0];

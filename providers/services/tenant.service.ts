@@ -19,8 +19,8 @@ export class TenantService {
     organisationId: string,
     isPlatformAdmin: boolean,
   ): Promise<void> {
-    await client.query(`SET LOCAL app.current_organisation_id = $1`, [organisationId]);
-    await client.query(`SET LOCAL app.is_platform_admin = $1`, [isPlatformAdmin.toString()]);
+    await client.query(`SET LOCAL app.current_organisation_id = '${organisationId.replace(/'/g, "''")}'`);
+    await client.query(`SET LOCAL app.is_platform_admin = '${isPlatformAdmin}'`);
   }
 
   /**

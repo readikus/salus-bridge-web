@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
-import { AuthService } from "@/providers/services/auth.service";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { EmployeeService } from "@/providers/services/employee.service";
 import { EmployeeRepository } from "@/providers/repositories/employee.repository";
 import { AuditLogService } from "@/providers/services/audit-log.service";
-import { PERMISSIONS } from "@/constants/permissions";
 import { AuditAction, AuditEntity } from "@/types/enums";
-
-const auth0 = new Auth0Client();
 
 /**
  * GET /api/me/data
@@ -16,14 +12,9 @@ const auth0 = new Auth0Client();
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     // Find the employee record for this user

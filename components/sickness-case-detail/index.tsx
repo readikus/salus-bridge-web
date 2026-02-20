@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, ArrowRight } from "lucide-react";
-import { fetchTransitionCase } from "@/actions/sickness-cases";
+import { Clock, ArrowRight, Save } from "lucide-react";
+import { fetchTransitionCase, fetchUpdateSicknessCase } from "@/actions/sickness-cases";
 import { SicknessCase, CaseTransition } from "@/types/database";
 import { SicknessState, SicknessAction } from "@/constants/sickness-states";
 import { ABSENCE_TYPE_LABELS, AbsenceType } from "@/constants/absence-types";
@@ -49,6 +49,35 @@ export function SicknessCaseDetail({ sicknessCase, transitions, availableActions
   const [transitionNotes, setTransitionNotes] = useState("");
   const [showNotesModal, setShowNotesModal] = useState<SicknessAction | null>(null);
   const [hasError, setHasError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const toDateInputValue = (dateStr: string | Date | null): string => {
+    if (!dateStr) return "";
+    const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
+    return date.toISOString().split("T")[0];
+  };
+
+  const [startDate, setStartDate] = useState(toDateInputValue(sicknessCase.absenceStartDate));
+  const [endDate, setEndDate] = useState(toDateInputValue(sicknessCase.absenceEndDate));
+
+  const handleSaveDates = async () => {
+    try {
+      setIsSaving(true);
+      setHasError(null);
+      await fetchUpdateSicknessCase(sicknessCase.id, {
+        absenceStartDate: startDate,
+        absenceEndDate: endDate || undefined,
+      });
+      setSuccessMessage("Dates updated successfully");
+      setTimeout(() => setSuccessMessage(null), 3000);
+      router.refresh();
+    } catch (err: any) {
+      setHasError(err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleTransition = async (action: SicknessAction) => {
     try {
@@ -68,6 +97,12 @@ export function SicknessCaseDetail({ sicknessCase, transitions, availableActions
     <div className="space-y-6">
       {hasError && (
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{hasError}</div>
+      )}
+
+      {successMessage && (
+        <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          {successMessage}
+        </div>
       )}
 
       {/* Case summary card */}
@@ -98,11 +133,29 @@ export function SicknessCaseDetail({ sicknessCase, transitions, availableActions
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <p className="text-xs font-medium text-gray-500">Start Date</p>
-            <p className="mt-1 text-sm text-gray-900">{formatDate(sicknessCase.absenceStartDate)}</p>
+            {canManage ? (
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            ) : (
+              <p className="mt-1 text-sm text-gray-900">{formatDate(sicknessCase.absenceStartDate)}</p>
+            )}
           </div>
           <div>
             <p className="text-xs font-medium text-gray-500">End Date</p>
-            <p className="mt-1 text-sm text-gray-900">{formatDate(sicknessCase.absenceEndDate)}</p>
+            {canManage ? (
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            ) : (
+              <p className="mt-1 text-sm text-gray-900">{formatDate(sicknessCase.absenceEndDate)}</p>
+            )}
           </div>
           <div>
             <p className="text-xs font-medium text-gray-500">Working Days Lost</p>
@@ -115,6 +168,19 @@ export function SicknessCaseDetail({ sicknessCase, transitions, availableActions
             <p className="mt-1 text-sm text-gray-900">{formatDate(sicknessCase.createdAt)}</p>
           </div>
         </div>
+
+        {canManage && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={handleSaveDates}
+              disabled={isSaving}
+              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+            >
+              <Save className="h-4 w-4" />
+              {isSaving ? "Saving..." : "Save Dates"}
+            </button>
+          </div>
+        )}
 
         {sicknessCase.notes && (
           <div className="mt-4">

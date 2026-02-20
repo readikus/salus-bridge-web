@@ -192,6 +192,43 @@ export class SicknessCaseService {
   }
 
   /**
+   * Update start date and optionally end date for a sickness case.
+   * Recalculates working days lost when both dates are present.
+   */
+  static async updateDates(
+    id: string,
+    startDate: string,
+    endDate: string | null,
+    organisationId: string,
+    userId: string,
+  ): Promise<SicknessCase> {
+    const sicknessCase = await TenantService.withTenant(organisationId, false, async (client) => {
+      const existing = await SicknessCaseRepository.findById(id, client);
+      if (!existing || existing.organisationId !== organisationId) {
+        throw new Error("Sickness case not found");
+      }
+
+      let workingDaysLost: number | null = null;
+      if (endDate) {
+        workingDaysLost = await WorkingDaysService.calculateWorkingDaysLost(startDate, endDate);
+      }
+
+      return SicknessCaseRepository.updateDates(id, startDate, endDate, workingDaysLost, client);
+    });
+
+    await AuditLogService.log({
+      userId,
+      organisationId,
+      action: AuditAction.UPDATE,
+      entity: AuditEntity.SICKNESS_CASE,
+      entityId: id,
+      metadata: { startDate, endDate, workingDaysLost: sicknessCase.workingDaysLost },
+    });
+
+    return sicknessCase;
+  }
+
+  /**
    * Get transitions for a sickness case (chronological timeline).
    */
   static async getTransitions(caseId: string): Promise<CaseTransition[]> {

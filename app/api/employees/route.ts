@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { AuthService } from "@/providers/services/auth.service";
 import { EmployeeService } from "@/providers/services/employee.service";
 import { EmployeeRepository } from "@/providers/repositories/employee.repository";
@@ -9,8 +9,6 @@ import { CreateEmployeeSchema } from "@/schemas/employee";
 import { AuditAction, AuditEntity, UserRole } from "@/types/enums";
 import { pool } from "@/providers/database/pool";
 
-const auth0 = new Auth0Client();
-
 /**
  * GET /api/employees
  * List employees for the current organisation.
@@ -18,14 +16,9 @@ const auth0 = new Auth0Client();
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const organisationId = sessionUser.currentOrganisationId;
@@ -83,14 +76,9 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const organisationId = sessionUser.currentOrganisationId;

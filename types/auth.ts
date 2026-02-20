@@ -16,7 +16,7 @@ export interface UserRoleWithOrg {
 export interface SessionUser {
   id: string;
   email: string;
-  auth0Id: string;
+  supabaseAuthId: string;
   firstName: string | null;
   lastName: string | null;
   roles: UserRoleWithOrg[];
@@ -25,16 +25,13 @@ export interface SessionUser {
 }
 
 /**
- * Auth0 user profile as received from the callback.
+ * Auth profile as received from Supabase Auth.
  */
-export interface Auth0Profile {
-  sub: string;
+export interface AuthProfile {
+  id: string;
   email: string;
-  given_name?: string;
-  family_name?: string;
-  name?: string;
-  picture?: string;
-  email_verified?: boolean;
+  firstName?: string;
+  lastName?: string;
 }
 
 /**

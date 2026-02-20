@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { AuthService } from "@/providers/services/auth.service";
 import { OrganisationService } from "@/providers/services/organisation.service";
 import { OrganisationRepository } from "@/providers/repositories/organisation.repository";
@@ -9,14 +9,9 @@ import { OrganisationListClient } from "./organisation-list-client";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-const auth0 = new Auth0Client();
-
 export default async function OrganisationsPage() {
-  const session = await auth0.getSession();
-  if (!session) redirect("/auth/login");
-
-  const sessionUser = await AuthService.getSessionUser(session.user.sub);
-  if (!sessionUser) redirect("/auth/login");
+  const sessionUser = await getAuthenticatedUser();
+  if (!sessionUser) redirect("/login");
 
   // Platform admin only
   if (!AuthService.validateAccess(sessionUser, PERMISSIONS.MANAGE_ORGANISATIONS)) {

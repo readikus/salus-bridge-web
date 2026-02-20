@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { LogOut, Shield } from "lucide-react";
 import { UserRole } from "@/types/enums";
+import { createBrowserClient } from "@/providers/supabase/browser-client";
 import { getNavItemsForRoles } from "./nav-items";
 
 interface Props {
@@ -17,7 +18,7 @@ interface Props {
 export function Sidebar({ userEmail, userName, organisationName, roles, isSuperAdmin }: Props) {
   const pathname = usePathname();
 
-  const navItems = getNavItemsForRoles(roles);
+  const navItems = getNavItemsForRoles(roles, isSuperAdmin);
 
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-gray-200 bg-white">
@@ -73,13 +74,16 @@ export function Sidebar({ userEmail, userName, organisationName, roles, isSuperA
             </span>
           )}
         </div>
-        <a
-          href="/auth/logout"
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+        <button
+          onClick={() => {
+            const supabase = createBrowserClient();
+            supabase.auth.signOut().then(() => { window.location.href = "/login"; });
+          }}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
           <LogOut className="h-4 w-4" />
           Log out
-        </a>
+        </button>
       </div>
     </aside>
   );

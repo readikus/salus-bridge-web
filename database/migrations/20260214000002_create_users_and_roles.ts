@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     CREATE TABLE users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       email VARCHAR(255) UNIQUE NOT NULL,
-      auth0_id VARCHAR(255) UNIQUE,
+      supabase_auth_id VARCHAR(255) UNIQUE,
       first_name VARCHAR(100),
       last_name VARCHAR(100),
       is_active BOOLEAN DEFAULT true,
@@ -16,7 +16,7 @@ export async function up(knex: Knex): Promise<void> {
   `);
 
   await knex.raw("CREATE INDEX idx_users_email ON users(email)");
-  await knex.raw("CREATE INDEX idx_users_auth0_id ON users(auth0_id)");
+  await knex.raw("CREATE INDEX idx_users_supabase_auth_id ON users(supabase_auth_id)");
 
   // Create user_roles table
   await knex.raw(`

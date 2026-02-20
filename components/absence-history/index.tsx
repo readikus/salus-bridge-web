@@ -20,6 +20,7 @@ import { ABSENCE_TYPE_LABELS, AbsenceType } from "@/constants/absence-types";
 interface Props {
   cases: SicknessCase[];
   total: number;
+  hideEmployeeName?: boolean;
 }
 
 /**
@@ -50,13 +51,25 @@ function formatStatus(status: string): string {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function AbsenceHistory({ cases, total }: Props) {
+export function AbsenceHistory({ cases, total, hideEmployeeName }: Props) {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([{ id: "absenceStartDate", desc: true }]);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [searchFilter, setSearchFilter] = useState<string>("");
 
   const columns = [
+    ...(hideEmployeeName
+      ? []
+      : [
+          columnHelper.display({
+            id: "employeeName",
+            header: "Employee",
+            cell: (info) => {
+              const { employeeFirstName, employeeLastName } = info.row.original;
+              return [employeeFirstName, employeeLastName].filter(Boolean).join(" ") || "---";
+            },
+          }),
+        ]),
     columnHelper.accessor("absenceType", {
       header: "Absence Type",
       cell: (info) => ABSENCE_TYPE_LABELS[info.getValue() as AbsenceType] || info.getValue(),
@@ -113,7 +126,7 @@ export function AbsenceHistory({ cases, total }: Props) {
       cell: (info) => (
         <button
           onClick={() => router.push(`/sickness/${info.row.original.id}`)}
-          className="text-sm text-blue-600 hover:text-blue-800"
+          className="cursor-pointer text-sm text-blue-600 hover:text-blue-800"
         >
           View
         </button>

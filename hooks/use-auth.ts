@@ -1,7 +1,7 @@
 "use client";
 
-import { useUser } from "@auth0/nextjs-auth0/client";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { createBrowserClient } from "@/providers/supabase/browser-client";
 import { hasPermission } from "@/constants/permissions";
 import { SessionUser, UserRoleWithOrg } from "@/types/auth";
 
@@ -12,19 +12,46 @@ interface UseAuthReturn {
   roles: UserRoleWithOrg[];
   currentOrganisationId: string | null;
   can: (permission: string) => boolean;
+  signOut: () => Promise<void>;
 }
 
 /**
- * Custom auth hook wrapping Auth0's useUser() with extended role/permission data.
+ * Custom auth hook using Supabase auth state with extended role/permission data.
  * Fetches the full SessionUser (roles, permissions) from /api/auth/me on mount.
  */
 export function useAuth(): UseAuthReturn {
-  const { user: auth0User, isLoading: isAuth0Loading } = useUser();
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isSupabaseUser, setIsSupabaseUser] = useState(false);
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [isLoadingMe, setIsLoadingMe] = useState(false);
 
   useEffect(() => {
-    if (!auth0User) {
+    const supabase = createBrowserClient();
+
+    // Check initial auth state
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsSupabaseUser(!!user);
+      setIsAuthLoading(false);
+    });
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsSupabaseUser(!!session?.user);
+      setIsAuthLoading(false);
+      if (!session?.user) {
+        setSessionUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseUser) {
       setSessionUser(null);
       return;
     }
@@ -57,18 +84,11 @@ export function useAuth(): UseAuthReturn {
     return () => {
       cancelled = true;
     };
-  }, [auth0User]);
+  }, [isSupabaseUser]);
 
   const roles = useMemo(() => sessionUser?.roles || [], [sessionUser]);
-  const currentOrganisationId = useMemo(
-    () => sessionUser?.currentOrganisationId || null,
-    [sessionUser],
-  );
+  const currentOrganisationId = useMemo(() => sessionUser?.currentOrganisationId || null, [sessionUser]);
 
-  /**
-   * Memoized permission check.
-   * Returns true if the current user has the specified permission.
-   */
   const can = useCallback(
     (permission: string): boolean => {
       if (!sessionUser) return false;
@@ -78,12 +98,19 @@ export function useAuth(): UseAuthReturn {
     [sessionUser, roles, currentOrganisationId],
   );
 
+  const signOut = useCallback(async () => {
+    const supabase = createBrowserClient();
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  }, []);
+
   return {
     user: sessionUser,
-    isLoading: isAuth0Loading || isLoadingMe,
-    isAuthenticated: !!auth0User && !!sessionUser,
+    isLoading: isAuthLoading || isLoadingMe,
+    isAuthenticated: isSupabaseUser && !!sessionUser,
     roles,
     currentOrganisationId,
     can,
+    signOut,
   };
 }

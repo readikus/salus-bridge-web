@@ -55,12 +55,12 @@ export class InvitationService {
   }
 
   /**
-   * Accept an invitation: link Auth0 user, assign EMPLOYEE role, mark as active.
+   * Accept an invitation: link user, assign EMPLOYEE role, mark as active.
    * Per user decision: click magic link -> set password -> straight to dashboard.
    */
   static async acceptInvitation(
     token: string,
-    auth0Id: string,
+    supabaseAuthId: string,
     userId: string,
   ): Promise<void> {
     const { valid, employee } = await this.validateToken(token);
@@ -85,7 +85,7 @@ export class InvitationService {
       action: AuditAction.UPDATE,
       entity: AuditEntity.EMPLOYEE,
       entityId: employee.id,
-      metadata: { event: "invitation_accepted", auth0Id },
+      metadata: { event: "invitation_accepted", supabaseAuthId },
     });
   }
 

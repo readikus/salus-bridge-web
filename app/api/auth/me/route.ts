@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
-import { AuthService } from "@/providers/services/auth.service";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { getAllPermissions } from "@/constants/permissions";
-
-const auth0 = new Auth0Client();
 
 /**
  * GET /api/auth/me
@@ -12,23 +9,10 @@ const auth0 = new Auth0Client();
  */
 export async function GET() {
   try {
-    const session = await auth0.getSession();
-
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    // Get or create the local user with roles
-    let sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
 
     if (!sessionUser) {
-      // First login — create local user
-      sessionUser = await AuthService.handleLoginCallback({
-        sub: session.user.sub,
-        email: session.user.email!,
-        given_name: session.user.given_name,
-        family_name: session.user.family_name,
-      });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const permissions = getAllPermissions(sessionUser.roles);

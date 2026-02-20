@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { AuthService } from "@/providers/services/auth.service";
 import { OrganisationService } from "@/providers/services/organisation.service";
 import { OrgSettingsSchema } from "@/schemas/organisation";
 import { PERMISSIONS } from "@/constants/permissions";
-
-const auth0 = new Auth0Client();
 
 /**
  * GET /api/organisations/[slug]/settings
@@ -14,14 +12,9 @@ const auth0 = new Auth0Client();
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const organisation = await OrganisationService.getBySlug(slug);
@@ -51,14 +44,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const organisation = await OrganisationService.getBySlug(slug);

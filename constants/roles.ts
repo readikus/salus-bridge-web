@@ -17,7 +17,7 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
  * Per CLAUDE.md pattern: UserService.isSuperAdmin() checks against this list.
  */
 export const SUPER_ADMIN_EMAILS: string[] = [
-  // Add super admin emails here
+  "ianharveyread@gmail.com",
 ];
 
 /**

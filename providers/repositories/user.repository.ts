@@ -3,14 +3,14 @@ import { User } from "@/types/database";
 
 export interface CreateUserParams {
   email: string;
-  auth0Id?: string;
+  supabaseAuthId?: string;
   firstName?: string;
   lastName?: string;
 }
 
 export interface UpdateUserParams {
   email?: string;
-  auth0Id?: string;
+  supabaseAuthId?: string;
   firstName?: string;
   lastName?: string;
   isActive?: boolean;
@@ -25,7 +25,7 @@ export class UserRepository {
       `SELECT
         id,
         email,
-        auth0_id AS "auth0Id",
+        supabase_auth_id AS "supabaseAuthId",
         first_name AS "firstName",
         last_name AS "lastName",
         is_active AS "isActive",
@@ -47,7 +47,7 @@ export class UserRepository {
       `SELECT
         id,
         email,
-        auth0_id AS "auth0Id",
+        supabase_auth_id AS "supabaseAuthId",
         first_name AS "firstName",
         last_name AS "lastName",
         is_active AS "isActive",
@@ -62,22 +62,22 @@ export class UserRepository {
   }
 
   /**
-   * Find a user by their Auth0 ID (sub claim).
+   * Find a user by their Supabase Auth ID.
    */
-  static async findByAuth0Id(auth0Id: string): Promise<User | null> {
+  static async findBySupabaseAuthId(supabaseAuthId: string): Promise<User | null> {
     const result = await pool.query(
       `SELECT
         id,
         email,
-        auth0_id AS "auth0Id",
+        supabase_auth_id AS "supabaseAuthId",
         first_name AS "firstName",
         last_name AS "lastName",
         is_active AS "isActive",
         created_at AS "createdAt",
         updated_at AS "updatedAt"
       FROM users
-      WHERE auth0_id = $1`,
-      [auth0Id],
+      WHERE supabase_auth_id = $1`,
+      [supabaseAuthId],
     );
 
     return result.rows[0] || null;
@@ -88,18 +88,18 @@ export class UserRepository {
    */
   static async create(params: CreateUserParams): Promise<User> {
     const result = await pool.query(
-      `INSERT INTO users (email, auth0_id, first_name, last_name)
+      `INSERT INTO users (email, supabase_auth_id, first_name, last_name)
       VALUES ($1, $2, $3, $4)
       RETURNING
         id,
         email,
-        auth0_id AS "auth0Id",
+        supabase_auth_id AS "supabaseAuthId",
         first_name AS "firstName",
         last_name AS "lastName",
         is_active AS "isActive",
         created_at AS "createdAt",
         updated_at AS "updatedAt"`,
-      [params.email, params.auth0Id || null, params.firstName || null, params.lastName || null],
+      [params.email, params.supabaseAuthId || null, params.firstName || null, params.lastName || null],
     );
 
     return result.rows[0];
@@ -117,9 +117,9 @@ export class UserRepository {
       setClauses.push(`email = $${paramIndex++}`);
       values.push(params.email);
     }
-    if (params.auth0Id !== undefined) {
-      setClauses.push(`auth0_id = $${paramIndex++}`);
-      values.push(params.auth0Id);
+    if (params.supabaseAuthId !== undefined) {
+      setClauses.push(`supabase_auth_id = $${paramIndex++}`);
+      values.push(params.supabaseAuthId);
     }
     if (params.firstName !== undefined) {
       setClauses.push(`first_name = $${paramIndex++}`);
@@ -144,7 +144,7 @@ export class UserRepository {
       RETURNING
         id,
         email,
-        auth0_id AS "auth0Id",
+        supabase_auth_id AS "supabaseAuthId",
         first_name AS "firstName",
         last_name AS "lastName",
         is_active AS "isActive",
@@ -164,7 +164,7 @@ export class UserRepository {
       `SELECT DISTINCT
         u.id,
         u.email,
-        u.auth0_id AS "auth0Id",
+        u.supabase_auth_id AS "supabaseAuthId",
         u.first_name AS "firstName",
         u.last_name AS "lastName",
         u.is_active AS "isActive",

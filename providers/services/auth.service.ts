@@ -4,16 +4,16 @@ import { UserRoleRepository } from "@/providers/repositories/user-role.repositor
 import { AuditLogService } from "@/providers/services/audit-log.service";
 import { hasPermission } from "@/constants/permissions";
 import { AuditAction, AuditEntity } from "@/types/enums";
-import { Auth0Profile, SessionUser } from "@/types/auth";
+import { AuthProfile, SessionUser } from "@/types/auth";
 
 export class AuthService {
   /**
-   * Handle the Auth0 login callback.
+   * Handle the login callback.
    * Orchestrates: find/create user, load roles, determine current org.
    */
-  static async handleLoginCallback(auth0Profile: Auth0Profile): Promise<SessionUser> {
+  static async handleLoginCallback(authProfile: AuthProfile): Promise<SessionUser> {
     // Find or create the local user
-    const user = await UserService.findOrCreateFromAuth0(auth0Profile);
+    const user = await UserService.findOrCreateFromAuth(authProfile);
 
     // Load roles
     const roles = await UserRoleRepository.findByUserId(user.id);
@@ -32,7 +32,7 @@ export class AuthService {
       entity: AuditEntity.USER,
       entityId: user.id,
       metadata: {
-        auth0Id: auth0Profile.sub,
+        supabaseAuthId: authProfile.id,
         isSuperAdmin,
         roleCount: roles.length,
       },
@@ -41,7 +41,7 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      auth0Id: user.auth0Id!,
+      supabaseAuthId: user.supabaseAuthId!,
       firstName: user.firstName,
       lastName: user.lastName,
       roles,
@@ -51,11 +51,11 @@ export class AuthService {
   }
 
   /**
-   * Get the current session user by Auth0 ID.
+   * Get the current session user by Supabase Auth ID.
    * Used by /api/auth/me to hydrate client-side state.
    */
-  static async getSessionUser(auth0Id: string): Promise<SessionUser | null> {
-    const user = await UserRepository.findByAuth0Id(auth0Id);
+  static async getSessionUser(supabaseAuthId: string): Promise<SessionUser | null> {
+    const user = await UserRepository.findBySupabaseAuthId(supabaseAuthId);
     if (!user) return null;
 
     return UserService.getUserWithRoles(user.id);
@@ -64,11 +64,7 @@ export class AuthService {
   /**
    * Validate if a user has a specific permission, optionally scoped to an org.
    */
-  static validateAccess(
-    user: SessionUser,
-    permission: string,
-    organisationId?: string,
-  ): boolean {
+  static validateAccess(user: SessionUser, permission: string, organisationId?: string): boolean {
     // Super admins have all permissions
     if (user.isSuperAdmin) return true;
 

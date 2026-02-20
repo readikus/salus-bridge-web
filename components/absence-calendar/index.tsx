@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { getDaysInMonth, startOfMonth, getDay, format, addMonths, subMonths } from "date-fns";
+import { getDaysInMonth, startOfMonth, getDay, format, addMonths, subMonths, isToday } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -62,7 +62,7 @@ export function AbsenceCalendar({ absences, month, year }: Props) {
 
     for (const absence of absences) {
       const absStart = new Date(absence.startDate);
-      const absEnd = absence.endDate ? new Date(absence.endDate) : new Date(currentYear, currentMonth + 1, 0);
+      const absEnd = absence.endDate ? new Date(absence.endDate) : new Date(); // Open cases cap at today
 
       const monthStart = new Date(currentYear, currentMonth, 1);
       const monthEnd = new Date(currentYear, currentMonth, daysInMonth);
@@ -114,9 +114,11 @@ export function AbsenceCalendar({ absences, month, year }: Props) {
         {/* Day cells */}
         {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
           const dayAbs = dayAbsences[day] || [];
+          const todayDate = new Date(currentYear, currentMonth, day);
+          const isTodayCell = isToday(todayDate);
           return (
-            <div key={day} className="bg-white min-h-[80px] p-1">
-              <div className="text-xs font-medium text-gray-400 mb-1">{day}</div>
+            <div key={day} className={`min-h-[80px] p-1 ${isTodayCell ? "bg-blue-50 ring-1 ring-inset ring-blue-400" : "bg-white"}`}>
+              <div className={`text-xs font-medium mb-1 ${isTodayCell ? "text-blue-600" : "text-gray-400"}`}>{day}</div>
               <div className="space-y-0.5">
                 {dayAbs.slice(0, 3).map((absence) => {
                   const statusStyle = STATUS_COLOURS[absence.status] || STATUS_COLOURS.REPORTED;
@@ -152,10 +154,12 @@ export function AbsenceCalendar({ absences, month, year }: Props) {
         {daysWithAbsences.length === 0 && (
           <p className="text-sm text-gray-500 text-center py-8">No absences this month.</p>
         )}
-        {daysWithAbsences.map(([day, abs]) => (
-          <div key={day} className="rounded-lg border border-gray-200 p-3">
-            <div className="text-xs font-medium text-gray-500 mb-2">
-              {format(new Date(currentYear, currentMonth, Number(day)), "EEEE d MMMM")}
+        {daysWithAbsences.map(([day, abs]) => {
+          const isTodayEntry = isToday(new Date(currentYear, currentMonth, Number(day)));
+          return (
+          <div key={day} className={`rounded-lg border p-3 ${isTodayEntry ? "border-blue-400 bg-blue-50" : "border-gray-200"}`}>
+            <div className={`text-xs font-medium mb-2 ${isTodayEntry ? "text-blue-600" : "text-gray-500"}`}>
+              {format(new Date(currentYear, currentMonth, Number(day)), "EEEE d MMMM")}{isTodayEntry ? " (Today)" : ""}
             </div>
             <div className="space-y-1">
               {abs.map((absence) => {
@@ -172,7 +176,8 @@ export function AbsenceCalendar({ absences, month, year }: Props) {
               })}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     );
   };

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { getAuthenticatedUser } from "@/providers/supabase/auth-helpers";
 import { AuthService } from "@/providers/services/auth.service";
 import { OrganisationService } from "@/providers/services/organisation.service";
 import { AuditLogService } from "@/providers/services/audit-log.service";
@@ -7,22 +7,15 @@ import { CreateOrganisationSchema } from "@/schemas/organisation";
 import { PERMISSIONS } from "@/constants/permissions";
 import { AuditAction, AuditEntity } from "@/types/enums";
 
-const auth0 = new Auth0Client();
-
 /**
  * GET /api/organisations
  * List all organisations (platform admin only - PLAT-03).
  */
 export async function GET() {
   try {
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     if (!AuthService.validateAccess(sessionUser, PERMISSIONS.MANAGE_ORGANISATIONS)) {
@@ -51,14 +44,9 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth0.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const sessionUser = await AuthService.getSessionUser(session.user.sub);
+    const sessionUser = await getAuthenticatedUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     if (!AuthService.validateAccess(sessionUser, PERMISSIONS.MANAGE_ORGANISATIONS)) {
@@ -75,10 +63,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const organisation = await OrganisationService.create(
-      { name: parsed.data.name, slug: parsed.data.slug },
-      sessionUser.id,
-    );
+    const organisation = await OrganisationService.create({ name: parsed.data.name, slug: parsed.data.slug }, sessionUser.id);
     return NextResponse.json({ organisation }, { status: 201 });
   } catch (error: any) {
     if (error.message?.includes("already exists")) {

@@ -1,7 +1,6 @@
 import { UserRole } from "@/types/enums";
 import {
   Building2,
-  Users,
   ScrollText,
   LayoutDashboard,
   UserCog,
@@ -40,12 +39,6 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Organisations",
     href: "/organisations",
     icon: Building2,
-    roles: [UserRole.PLATFORM_ADMIN],
-  },
-  {
-    label: "Users",
-    href: "/users",
-    icon: Users,
     roles: [UserRole.PLATFORM_ADMIN],
   },
   {
